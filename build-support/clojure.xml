@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Copyright © 2011 Sattvik Software & Technology Resources, Ltd. Co.
+  All rights reserved.
+
+  This program and the accompanying materials are made available under the
+  terms of the Eclipse Public License v1.0 which accompanies this distribution,
+  and is available at <http://www.eclipse.org/legal/epl-v10.html>.
+
+  By using this software in any fashion, you are agreeing to be bound by the
+  terms of this license.  You must not remove this notice, or any other, from
+-->
+
+<project name="android-clojure-support" basedir=".">
+    <dirname property="android-clojure-support.dir" file="${ant.file.android-clojure-support}"/>
+
+    <property file="${android-clojure-support.dir}/clojure.properties"/>
+
+    <!-- Modified input directories -->
+    <property name="source.dir" value="src/java" />
+    <property name="clojure.source.dir" value="src/clojure" />
+    <property name="clojure.source.absolute.dir" location="${clojure.source.dir}" />
+
+    <!-- Clojure output directories -->
+    <property name="out.dir" value="bin"/>
+    <property name="clojure.out.dir" value="${out.dir}" />
+    <property name="clojure.out.absolute.dir" location="${clojure.out.dir}" />
+    <property name="clojure.out.classes.dir" value="${clojure.out.absolute.dir}/classes" />
+    <property name="clojure.out.classes.absolute.dir" location="${clojure.out.classes.dir}" />
+
+    <!-- Ensure that the Java source directory exists since Git does not
+         preserve empty directories -->
+    <target name="-pre-build">
+        <mkdir dir="${source.absolute.dir}"/>
+        <mkdir dir="${clojure.out.classes.absolute.dir}"/>
+    </target>
+
+    <target name="-clojure-compile">
+        <condition property="libs.ref"
+                value="android.libraries.jars"
+                else="jar.libs.ref">
+            <isset property="android.library"/>
+        </condition>
+        <condition property="libs.dir"
+                value="./libs"
+                else="${jar.libs.dir}">
+            <isset property="android.library"/>
+        </condition>
+        <condition property="extensible.classpath"
+                value="${tested.project.absolute.dir}/bin/classes"
+                else=".">
+            <isset property="tested.project.absolute.dir" />
+        </condition>
+        <condition property="extensible.libs.classpath"
+                value="${tested.project.absolute.dir}/libs"
+                else="${libs.dir}">
+            <isset property="tested.project.absolute.dir" />
+        </condition>
+        <pathconvert property="clojure.project.libraries.src"
+                refid="project.libraries.src">
+            <globmapper from="*/src/java" to="*/src/clojure"/>
+        </pathconvert>
+        <java classname="clojure.main"
+                classpath="${clojure.jar}"
+                classpathref="android.target.classpath"
+                fork="true"
+                failonerror="true">
+            <sysproperty key="clojure.compile.path" value="${clojure.out.classes.absolute.dir}"/>
+            <classpath>
+                <pathelement path="${extensible.classpath}"/>
+                <pathelement path="${clojure.source.absolute.dir}"/>
+                <path refid="${libs.ref}"/>
+                <pathelement path="${clojure.project.libraries.src}"/>
+                <fileset dir="${extensible.libs.classpath}" includes="*.jar" />
+                <pathelement path="${out.classes.absolute.dir}"/>
+            </classpath>
+            <arg file="${android-clojure-support.dir}/clojure-compile.clj"/>
+            <arg path="${clojure.source.absolute.dir}"/>
+            <arg path="${clojure.project.libraries.src}"/>
+        </java>
+    </target>
+
+    <target name="compile" depends="android_rules.compile,-clojure-compile"/>
+</project>
+
+<!-- vim:set ts=4 sw=4 et: -->

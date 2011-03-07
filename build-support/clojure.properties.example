@@ -1,0 +1,12 @@
+# This file will be sourced every time the ‘clojure.xml’ is imported into your
+# build.  You can set properties here that will affect all of your Android
+# projects that include Clojure support.
+#
+# Probably, the most  important property to set is ‘clojure.jar’, which will
+# set up the default Clojure libray to use during compilation.  Note that you
+# still need to include a Clojure JAR in the ‘libs’ directory of your main
+# application.  It is library and test projects that really need this property.
+
+clojure.jar=/path/to/clojure-nosrc-1.2.0.jar
+
+# vim:set ft=jproperties:
