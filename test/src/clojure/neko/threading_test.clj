@@ -44,8 +44,8 @@
   (let [intent (doto (Intent.)
                  (.addCategory Intent/CATEGORY_LAUNCHER)
                  (.addFlags Intent/FLAG_ACTIVITY_NEW_TASK)
-                 (.setClassName "android_toolkit.test_app"
-                                "android_toolkit.test_app.TestActivity")
+                 (.setClassName "com.sattvik.neko.test_app"
+                                "com.sattvik.neko.test_app.TestActivity")
                  (.setAction Intent/ACTION_MAIN))]
     (reset! activity (.startActivity this intent nil nil))))
 
