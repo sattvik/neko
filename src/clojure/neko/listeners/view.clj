@@ -9,7 +9,7 @@
 ; terms of this license.  You must not remove this notice, or any other, from
 ; this software.
 
-(ns android-toolkit.listeners.view
+(ns neko.listeners.view
   "Uility functions and macros for setting listeners corresponding to the
   android.view.View class."
   {:author "Daniel Solano Gómez"})

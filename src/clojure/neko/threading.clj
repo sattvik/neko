@@ -9,14 +9,14 @@
 ; terms of this license.  You must not remove this notice, or any other, from
 ; this software.
 
-(ns android-toolkit.threading
+(ns neko.threading
   "Utilities used to manage multiple threads on Android."
   {:author "Daniel Solano Gómez"}
   (:import android.app.Activity
            android.view.View
-           android_toolkit.threading.AsyncTask
            clojure.lang.IFn
-           java.util.concurrent.TimeUnit))
+           java.util.concurrent.TimeUnit
+           neko.threading.AsyncTask))
 
 (defn run-on-ui-thread*
   "Runs the given nullary function on the UI thread.  If this function is
@@ -93,9 +93,6 @@
 
 (def *async-task* nil)
 
-
-(use 'android-toolkit.log)
-(deflog "ARGH!")
 (defn publish-progress
   [& values]
   (if *async-task*

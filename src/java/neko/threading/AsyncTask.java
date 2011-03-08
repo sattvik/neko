@@ -11,7 +11,7 @@
  * terms of this license.  You must not remove this notice, or any other, from
  * this software.
  */
-package android_toolkit.threading;
+package neko.threading;
 
 public abstract class AsyncTask<Params,Progress,Result> extends android.os.AsyncTask<Params,Progress,Result> {
     public final void superPublishProgress(Progress... values) {

@@ -9,7 +9,7 @@
 ; terms of this license.  You must not remove this notice, or any other, from
 ; this software.
 
-(ns android-toolkit.compilation
+(ns neko.compilation
   "Utility functions for managing the compilation environment when using
   version of Clojure that supports dynamic compilation on the Dalvik virtual
   machine.

@@ -9,8 +9,8 @@
 ; terms of this license.  You must not remove this notice, or any other, from
 ; this software.
 
-(ns android-toolkit.log-test
-  "Tests the functionality of the clojure.contrib.android.log namespace"
+(ns neko.log-test
+  "Tests the functionality of the neko.log namespace"
   {:author "Daniel Solano Gómez"}
   (:gen-class :main false
               :extends junit.framework.TestCase
@@ -21,7 +21,7 @@
                         [testLogError [] void]]
               :exposes-methods {setUp superSetUp})
   (:import android.os.SystemClock)
-  (:use android-toolkit.log
+  (:use neko.log
         clojure.java.io
         clojure.java.shell
         junit.assert))

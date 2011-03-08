@@ -9,8 +9,8 @@
 ; terms of this license.  You must not remove this notice, or any other, from
 ; this software.
 
-(ns android-toolkit.listeners.view_test
-  "Tests for the android-toolkit.listeners.view namespace."
+(ns neko.listeners.view_test
+  "Tests for the neko.listeners.view namespace."
   {:author "Daniel Solano Gómez"}
   (:gen-class :main false
               :extends android.test.AndroidTestCase
@@ -22,7 +22,7 @@
                         [testOnTouch [] void]]
               :exposes-method {setUp superSetUp})
   (:import android.view.View)
-  (:use android-toolkit.listeners.view
+  (:use neko.listeners.view
         junit.assert))
 
 (def test-view (atom nil))

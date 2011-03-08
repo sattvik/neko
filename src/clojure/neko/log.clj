@@ -9,7 +9,7 @@
 ; terms of this license.  You must not remove this notice, or any other, from
 ; this software.
 
-(ns android-toolkit.log
+(ns neko.log
   "Utility for logging in Android.  To use this utility simply use the deflog
   macro as follows:
 

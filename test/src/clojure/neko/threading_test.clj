@@ -9,8 +9,8 @@
 ; terms of this license.  You must not remove this notice, or any other, from
 ; this software.
 
-(ns android-toolkit.threading-test
-  "Test for the android-toolkit.threading namespace."
+(ns neko.threading-test
+  "Test for the neko.threading namespace."
   {:author "Daniel Solano Gómez"}
   (:gen-class :main false
               :extends android.test.ActivityUnitTestCase
@@ -31,7 +31,7 @@
               :exposes-methods {setUp superSetUp})
   (:import android.content.Intent
            [java.util.concurrent CountDownLatch TimeoutException TimeUnit])
-  (:use android-toolkit.threading
+  (:use neko.threading
         junit.assert))
 
 (def activity (atom nil))
