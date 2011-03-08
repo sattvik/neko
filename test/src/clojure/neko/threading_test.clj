@@ -256,13 +256,14 @@
   ; not allowed in on-cancelled
   (let [task (new-task (fn [] (Thread/sleep 100)))
         fail-count (atom 0)
+        latch (CountDownLatch. 1)
         task (with-on-cancelled task (fn []
                                        (try
                                          (publish-progress \x \y \z)
                                          (catch IllegalStateException d
-                                           (swap! fail-count inc)))))
+                                           (swap! fail-count inc)
+                                           (.countDown latch)))))
         task (execute! task)]
     (cancel task)
-    (try (result-of task)
-      (catch java.util.concurrent.CancellationException _))
+    (.await latch)
     (is-eq 1 @fail-count)))
