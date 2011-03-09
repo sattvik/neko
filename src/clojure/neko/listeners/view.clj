@@ -26,13 +26,19 @@
 (defmacro on-click
   "Takes a body of expressions and yields a View.OnClickListener object that
   will invoke the body.  The body takes an implicit argument 'view' that is the
-  view that was clicked." [& body]
+  view that was clicked."
+  [& body]
   `(on-click-call (fn [~'view] ~@body)))
 
 (defn on-create-context-menu-call
   "Takes a function and yields a View.OnCreateContextMenuListener object that
-  will invoke the function.  This function must take the three arguments
-  described in on-create-context-menu."
+  will invoke the function.  This function must take the following three
+  arguments:
+
+  menu: the context menu that is being built
+  view: the view for which the context menu is being built
+  info: extra information about the item for which the context menu should be
+        shown.  This information will vary depending on the class of view."
   [handler-fn]
   (reify android.view.View$OnCreateContextMenuListener
     (onCreateContextMenu [this menu view info]
@@ -71,8 +77,10 @@
 
 (defn on-focus-change-call
   "Takes a function and yields a View.OnFocusChangeListener object that will
-  invoke the function.  This function must take the three arguments This
-  function must take the two arguments described in on-focus-change."
+  invoke the function.  This function must take the following two arguments:
+
+  view:     the view whose state has changed
+  focused?: the new focuse state for view"
   [handler-fn]
   (reify android.view.View$OnFocusChangeListener
     (onFocusChange [this view focused?]
@@ -90,12 +98,18 @@
 
 (defn on-key-call
   "Takes a function and yields a View.OnKeyListener object that will invoke the
-  function.  This function must take the three arguments and return a boolean
-  value as described in on-key."
+  function.  This function must take the following three arguments:
+
+  view:     the view the key has been dispatched to
+  key-code: the code for the physical key that was pressed
+  event:    the KeyEvent object containing full information about the event
+
+  The function should evaluate to a truthy value if it has consumed the event.
+  Otherwise, it should evaluate to false or nil."
   [handler-fn]
   (reify android.view.View$OnKeyListener
     (onKey [this view key-code event]
-      (handler-fn view key-code event))))
+      (boolean (handler-fn view key-code event)))))
 
 (defmacro on-key
   "Takes a body of expressions and yields a View.OnKeyListener object that will
@@ -105,8 +119,8 @@
   key-code: the code for the physical key that was pressed
   event:    the KeyEvent object containing full information about the event
 
-  The body should evaluate to true if it has consumed the event.  Otherwise, it
-  should evaluate to false."
+  The body should evaluate to a truthy value if it has consumed the event.
+  Otherwise, it should evaluate to false or nil."
   [& body]
   `(on-key-call (fn [~'view ~'key-code ~'event] ~@body)))
 
@@ -143,18 +157,18 @@
 (defn on-long-click-call
   "Takes a function and yields a View.OnLongClickListener object that will
   invoke the function.  This function must take one argument, the view that was
-  clicked, and must evaluate to true if it has consumed the long click, false
-  otherwise."
+  clicked, and must evaluate to a truthy value if it has consumed the long
+  click, false or nil otherwise."
   [handler-fn]
   (reify android.view.View$OnLongClickListener
     (onLongClick [this view]
-      (handler-fn view))))
+      (boolean (handler-fn view)))))
 
 (defmacro on-long-click
   "Takes a body of expressions and yields a View.OnLongClickListener object
   that will invoke the body.  The body takes an implicit argument 'view' that
-  is the view that was clicked and held.  It should also evaluate to true if it
-  consumes the long click, false otherwise."
+  is the view that was clicked and held.  The body should also evaluate to a
+  truthy value if it consumes the long click, false or nil otherwise."
   [& body]
   `(on-long-click-call (fn [~'view] ~@body)))
 
@@ -179,12 +193,17 @@
 
 (defn on-touch-call
   "Takes a function and yields a View.OnTouchListener object that will invoke
-  the function.  This function must take two arguments and return a boolean
-  value as described in on-touch."
+  the function.  This function must take the following two arguments:
+
+  view:  the view the touch event has been dispatched to
+  event: the MotionEvent object containing full information about the event
+
+  It should also evaluate to a truthy value if it consumes the event, false or
+  nil otherwise."
   [handler-fn]
   (reify android.view.View$OnTouchListener
     (onTouch [this view event]
-      (handler-fn view event))))
+      (boolean (handler-fn view event)))))
 
 (defmacro on-touch
   "Takes a body of expressions and yields a View.OnTouchListener object that
@@ -193,6 +212,7 @@
   view:  the view the touch event has been dispatched to
   event: the MotionEvent object containing full information about the event
   
-  It should also evaluate to true if it consumes the event, false otherwise."
+  It should also evaluate to a truthy value if it consumes the event, false or
+  nil otherwise."
   [& body]
   `(on-touch-call (fn [~'view ~'event] ~@body)))
