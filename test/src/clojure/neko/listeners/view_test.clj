@@ -9,7 +9,7 @@
 ; terms of this license.  You must not remove this notice, or any other, from
 ; this software.
 
-(ns neko.listeners.view_test
+(ns neko.listeners.view-test
   "Tests for the neko.listeners.view namespace."
   {:author "Daniel Solano Gómez"}
   (:gen-class :main false
@@ -20,7 +20,7 @@
                         [testOnKey [] void]
                         [testOnLongClick [] void]
                         [testOnTouch [] void]]
-              :exposes-method {setUp superSetUp})
+              :exposes-methods {setUp superSetUp})
   (:import android.view.View)
   (:use neko.listeners.view
         junit.assert))
@@ -31,6 +31,7 @@
 (defn -setUp
   "Creates new view for testing."
   [this]
+  (.superSetUp this)
   (reset! test-view (View. (.getContext this)))
   (reset! clicks 0))
 
