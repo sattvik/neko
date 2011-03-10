@@ -29,9 +29,8 @@
                         [testOnProgressUpdate [] void]
                         [testPublishOutOfContext [] void]]
               :exposes-methods {setUp superSetUp})
-  (:import android.content.Intent
-           [java.util.concurrent CountDownLatch TimeoutException TimeUnit])
-  (:use neko.threading
+  (:import [java.util.concurrent CountDownLatch TimeoutException TimeUnit])
+  (:use [neko test-utils threading]
         junit.assert))
 
 (def activity (atom nil))
@@ -41,13 +40,7 @@
 
 (defn -setUp [this]
   (.superSetUp this)
-  (let [intent (doto (Intent.)
-                 (.addCategory Intent/CATEGORY_LAUNCHER)
-                 (.addFlags Intent/FLAG_ACTIVITY_NEW_TASK)
-                 (.setClassName "com.sattvik.neko.test_app"
-                                "com.sattvik.neko.test_app.TestActivity")
-                 (.setAction Intent/ACTION_MAIN))]
-    (reset! activity (.startActivity this intent nil nil))))
+  (reset! activity (.startActivity this (start-intent) nil nil)))
 
 (defn -testRunOnUiThread [this]
   (let [ui-thread (Thread/currentThread)

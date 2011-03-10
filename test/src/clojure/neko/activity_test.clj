@@ -19,9 +19,9 @@
               :methods [[testWithActivity [] void]
                         ]
               :exposes-methods {setUp superSetUp})
-  (:import android.content.Intent)
   (:use neko.activity
         [neko.context :only [*context*]]
+        neko.test-utils
         junit.assert))
 
 (def activity (atom nil))
@@ -31,13 +31,7 @@
 
 (defn -setUp [this]
   (.superSetUp this)
-  (let [intent (doto (Intent.)
-                 (.addCategory Intent/CATEGORY_LAUNCHER)
-                 (.addFlags Intent/FLAG_ACTIVITY_NEW_TASK)
-                 (.setClassName "com.sattvik.neko.test_app"
-                                "com.sattvik.neko.test_app.TestActivity")
-                 (.setAction Intent/ACTION_MAIN))]
-    (reset! activity (.startActivity this intent nil nil))))
+  (reset! activity (.startActivity this (start-intent) nil nil)))
 
 (defn -testWithActivity
   "Test that the with-activity macro."
