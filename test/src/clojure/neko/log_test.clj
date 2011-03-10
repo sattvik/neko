@@ -42,14 +42,17 @@
           pattern (re-pattern text)
           start   (SystemClock/elapsedRealtime)
           timed-out? (fn [] (< 500 (- (SystemClock/elapsedRealtime) start)))]
-      (binding [*in* (reader (.getInputStream process))]
-        (loop [line (read-line)]
-          (cond
-            (or (nil? line)
-                (timed-out?)) nil
-            (and @start-signal
-                 (re-find pattern line)) line
-            :else (recur (read-line))))))))
+      (try
+        (binding [*in* (reader (.getInputStream process))]
+          (loop [line (read-line)]
+            (cond
+              (or (nil? line)
+                  (timed-out?)) nil
+              (and @start-signal
+                   (re-find pattern line)) line
+              :else (recur (read-line)))))
+        (finally
+          (.destroy process))))))
 
 (defn- start-collecting []
   (compare-and-set! start-signal false true))
