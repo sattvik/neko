@@ -23,6 +23,8 @@ The toolkit comes as two components:
 
    * ``neko.compilation`` helps set up dynamic compilation.
 
+   * ``neko.context`` helps retrieve resources from the application’s context.
+
    * ``neko.listeners`` contains namespaces that take the tedium to
      adding callback code to various widgets.
 
