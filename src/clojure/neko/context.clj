@@ -52,7 +52,7 @@
 
   Note that this method is much slower than using the constant directly, but
   results in more readable code."
-  ([context type name]
+  ([^Context context type name]
    (if (integer? name)
      name
      (let [package (or (namespace name) (.getPackageName context))
@@ -90,11 +90,11 @@
    (get-string *context* id-or-name))
   ([context id-or-name]
    (if (instance? Context context)
-     (.getString context (resolve-resource context :string id-or-name))
+     (.getString ^Context context (resolve-resource context :string id-or-name))
      (get-string *context* context id-or-name)))
   ([context id-or-name & args]
    (if (instance? Context context)
-     (.getString context
+     (.getString ^Context context
                  (resolve-resource context :string id-or-name)
                  (to-array args))
      (apply get-string *context* context id-or-name args))))
@@ -113,7 +113,7 @@
   :layout-inflater for the layout inflater service."
   ([type]
    (get-system-service *context* type))
-  ([context type]
+  ([^Context context type]
    ; using reflection here allows forward-compatibility
    (try
      (let [field-name (.. (name type) (replace \- \_) toUpperCase

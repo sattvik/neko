@@ -12,6 +12,7 @@
 (ns neko.activity
   "Utilities to aid in working with an activity."
   {:author "Daniel Solano Gómez"}
+  (:import android.app.Activity)
   (:require [neko.context :as context]))
 
 (def 
@@ -20,7 +21,7 @@
 
 (defmacro with-activity
   "Evaluates body such that both *activity* and *context* are bound to the given activiy."
-  [activity & body]
+  [^Activity activity & body]
   `(binding [context/*context* ~activity
              *activity* ~activity]
      ~@body))

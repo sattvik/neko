@@ -44,8 +44,8 @@
   "Clears all DEX and JAR files from the cache directory."
   []
   (locking cache-dir
-    (let [dir @cache-dir
-          delete-file (fn [name] (.delete (File. dir name)))]
+    (let [^File dir @cache-dir
+          delete-file (fn [^String name] (.delete (File. dir name)))]
       (when dir
         (->>
           (.list dir)

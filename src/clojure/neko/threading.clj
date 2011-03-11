@@ -96,7 +96,7 @@
 (defn publish-progress
   [& values]
   (if *async-task*
-    (.superPublishProgress *async-task* (to-array values))
+    (.superPublishProgress ^AsyncTask *async-task* (to-array values))
     (throw (IllegalStateException.
              "Not within the scope of a background function of a running asynchronous task."))))
 
@@ -155,7 +155,7 @@
   ([^Task task time]
    (result-of task time TimeUnit/MILLISECONDS))
   ([^Task task time units]
-   (if-let [real-task (.real_task task)]
+   (if-let [^android.os.AsyncTask real-task (.real_task task)]
      (if (= ::ignored time)
        (.get real-task)
        (.get real-task
@@ -170,7 +170,7 @@
 
 (defn cancel
   ([^Task task may-interrupt?]
-   (if-let [real-task (.real_task task)]
+   (if-let [^android.os.AsyncTask real-task (.real_task task)]
      (.cancel real-task may-interrupt?)
      (throw (IllegalArgumentException. "Cannot cancel an unexecuted task."))))
   ([^Task task]
