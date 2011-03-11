@@ -57,6 +57,11 @@
                 else="${libs.dir}">
             <isset property="tested.project.absolute.dir" />
         </condition>
+        <condition property="clojure.warn.reflection.env"
+                value="${clojure.warn.reflection}"
+                else="false">
+            <isset property="clojure.warn.reflection"/>
+        </condition>
         <pathconvert property="clojure.project.libraries.src"
                 refid="project.libraries.src">
             <globmapper from="*/src/java" to="*/src/clojure"/>
@@ -67,6 +72,7 @@
                 fork="true"
                 failonerror="true">
             <sysproperty key="clojure.compile.path" value="${clojure.out.classes.absolute.dir}"/>
+            <sysproperty key="clojure.warn.reflection" value="${clojure.warn.reflection.env}"/>
             <classpath>
                 <pathelement path="${extensible.classpath}"/>
                 <pathelement path="${clojure.source.absolute.dir}"/>

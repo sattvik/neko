@@ -14,6 +14,9 @@
 (import '[java.io File PushbackReader]
         '[java.util.regex Matcher Pattern])
 
+(set! *warn-on-reflection*
+      (Boolean/valueOf (System/getProperty "clojure.warn.reflection" "false")))
+
 (defn find-clojure-files
   "Finds all Clojure source files in a given directory."
   [path]
@@ -81,7 +84,7 @@
 (defn args->dirs
   "Splits any path arguments into directories"
   [args]
-  (let [split-path (fn [arg] (seq (.split arg (Pattern/quote File/pathSeparator))))]
+  (let [split-path (fn [^String arg] (seq (.split arg (Pattern/quote File/pathSeparator))))]
     (flatten (map split-path args))))
 
 (dorun (map compile-dir (args->dirs *command-line-args*)))

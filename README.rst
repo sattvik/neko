@@ -79,6 +79,13 @@ For most projects, that is all you have to do.  So long as your Clojure source
 files are in ``src/clojure`` and you have placed a Clojure JAR file in
 ``libs``, Ant will now automatically find and compile all of your Clojure code.
 
+Reflection warnings
+'''''''''''''''''''
+
+To enable reflection warnings during compilation, simply set the
+``clojure.warn.reflection`` property to ``true``.
+
+
 ``clojure.properties``
 ''''''''''''''''''''''
 
