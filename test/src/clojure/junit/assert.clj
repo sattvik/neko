@@ -31,6 +31,10 @@
   [actual]
   (Assert/assertNull actual))
 
+(defn is-not-nil
+  [actual]
+  (Assert/assertNotNull actual))
+
 (defn is-not-same
   [expected actual]
   (Assert/assertNotSame expected actual))
