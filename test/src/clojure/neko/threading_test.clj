@@ -116,9 +116,9 @@
   [this]
   (let [task (new-task (fn [] 1))]
     ; can't get result of un-executed task
-    (does-throw IllegalArgumentException (result-of task))
-    (does-throw IllegalArgumentException (result-of task 100))
-    (does-throw IllegalArgumentException (result-of task 1 :seconds))
+    (does-throw AssertionError (result-of task))
+    (does-throw AssertionError (result-of task 100))
+    (does-throw AssertionError (result-of task 1 :seconds))
     (let [task (execute! task)]
       ; blocking result-of
       (is-eq 1 (result-of task))
@@ -134,13 +134,13 @@
       (is-eq 1 (result-of task 100 TimeUnit/MICROSECONDS))
       (is-eq 1 (result-of task 100 TimeUnit/NANOSECONDS))
       ; invalid arguments
-      (does-throw IllegalArgumentException (result-of task "bogus"))
-      (does-throw IllegalArgumentException (result-of task :bogus))
-      (does-throw IllegalArgumentException (result-of task []))
-      (does-throw IllegalArgumentException (result-of task 100 :bogus))
-      (does-throw IllegalArgumentException (result-of task 100 "bogus"))
-      (does-throw NullPointerException (result-of task nil))
-      (does-throw NullPointerException (result-of task 100 nil))))
+      (does-throw AssertionError (result-of task "bogus"))
+      (does-throw AssertionError (result-of task :bogus))
+      (does-throw AssertionError (result-of task []))
+      (does-throw AssertionError (result-of task 100 :bogus))
+      (does-throw AssertionError (result-of task 100 "bogus"))
+      (does-throw AssertionError (result-of task nil))
+      (does-throw AssertionError (result-of task 100 nil))))
   ; test timeouts
   (let [exec-task (fn [] (execute! (new-task (fn [] (Thread/sleep 2000) 2))))]
     (does-throw TimeoutException (result-of (exec-task) 100))
@@ -216,7 +216,7 @@
   "Tests that trying to publish pogress outside the background function fails."
   [this]
   ; with no context at all
-  (does-throw IllegalStateException (publish-progress 1 2 3))
+  (does-throw AssertionError (publish-progress 1 2 3))
   ; not allowed in pre- or post-execute
   (let [fail-count (atom 0)
         latch (CountDownLatch. 1)
@@ -224,12 +224,12 @@
         task (with-pre-execute task (fn []
                                       (try
                                         (publish-progress)
-                                        (catch IllegalStateException e
+                                        (catch AssertionError _
                                           (swap! fail-count inc)))))
         task (with-post-execute task (fn [_]
                                        (try
                                          (publish-progress :bar)
-                                         (catch IllegalStateException e
+                                         (catch AssertionError _
                                            (swap! fail-count inc)))
                                        (.countDown latch)))]
     (execute! task)
@@ -241,7 +241,7 @@
         task (with-on-progress-update task (fn []
                                              (try
                                                (publish-progress)
-                                               (catch IllegalStateException e
+                                               (catch AssertionError _
                                                  (reset! did-throw true)))))
         task (execute! task)]
     (result-of task)
@@ -253,7 +253,7 @@
         task (with-on-cancelled task (fn []
                                        (try
                                          (publish-progress \x \y \z)
-                                         (catch IllegalStateException d
+                                         (catch AssertionError _
                                            (swap! fail-count inc)
                                            (.countDown latch)))))
         task (execute! task)]

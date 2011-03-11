@@ -68,7 +68,7 @@
    ^IFn post-fn
    ^IFn progress-fn
    ^IFn cancel-fn
-   ^android.os.AsyncTask real-task])
+   ^AsyncTask real-task])
 
 (defn new-task
   "Creates a new asynchronous task that will execute the given function in the background."
@@ -76,29 +76,28 @@
   (Task. f nil nil nil nil nil))
 
 (defn with-pre-execute
-  [^Task task f]
+  [task f]
   (assoc task :pre-fn f))
 
 (defn with-post-execute
-  [^Task task f]
+  [task f]
   (assoc task :post-fn f))
 
 (defn with-on-progress-update
-  [^Task task f]
+  [task f]
   (assoc task :progress-fn f))
 
 (defn with-on-cancelled
-  [^Task task f]
+  [task f]
   (assoc task :cancel-fn f))
 
-(def *async-task* nil)
+(def ^{:private true}
+  *async-task*)
 
 (defn publish-progress
   [& values]
-  (if *async-task*
-    (.superPublishProgress ^AsyncTask *async-task* (to-array values))
-    (throw (IllegalStateException.
-             "Not within the scope of a background function of a running asynchronous task."))))
+  {:pre [(bound? #'*async-task*)]}
+  (.superPublishProgress ^AsyncTask *async-task* (to-array values)))
 
 (defn execute!
   ""
@@ -127,7 +126,7 @@
                        (when-let [cancel-fn (.cancel_fn task)]
                          (cancel-fn))))]
      (assoc task :real-task (.execute real-task nil))))
-  ([^Task task]
+  ([task]
    (execute! task ::no-args)))
 
 (def ^{:doc "A map of unit keywords to TimeUnit instances."
@@ -150,30 +149,36 @@
 
   Note that if you use a TimeUnit instance, units larger than seconds are not
   supported before API level 9."
-  ([^Task task]
+  ([task]
    (result-of task ::ignored ::ignored))
-  ([^Task task time]
+  ([task time]
    (result-of task time TimeUnit/MILLISECONDS))
   ([^Task task time units]
-   (if-let [^android.os.AsyncTask real-task (.real_task task)]
+   {:pre [; must be executed
+          (.real_task task)
+          ; time must be ::ignored or a non-negative number
+          (or (= ::ignored time)
+              (and (number? time)
+                   (not (neg? time))))
+          ; units must be a valid keyword or a TimeUnit
+          (or (= ::ignored units)
+              (and (keyword? units)
+                   (units unit-map))
+              (instance? TimeUnit units))]}
+   (let [^AsyncTask real-task (.real_task task)]
      (if (= ::ignored time)
        (.get real-task)
-       (.get real-task
-             time
-             (cond 
-               (nil? units) (throw (NullPointerException. "Null time unit type"))
-               (instance? TimeUnit units) units
-               (and (keyword? units)
-                    (units unit-map)) (units unit-map)
-               :else (throw (IllegalArgumentException. "Invalid time unit type")))))
-     (throw (IllegalArgumentException. "Cannot get the result of an unexecuted task.")))))
+       (.get real-task time (cond
+                              (keyword? units) (units unit-map)
+                              :else units))))))
 
 (defn cancel
   ([^Task task may-interrupt?]
-   (if-let [^android.os.AsyncTask real-task (.real_task task)]
-     (.cancel real-task may-interrupt?)
-     (throw (IllegalArgumentException. "Cannot cancel an unexecuted task."))))
-  ([^Task task]
+   {:pre [; must be executed
+          (.real_task task)]}
+   (let [^AsyncTask real-task (.real_task task)]
+     (.cancel real-task (boolean may-interrupt?))))
+  ([task]
    (cancel task true))
   )
 

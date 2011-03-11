@@ -21,7 +21,7 @@
 
 (defmacro with-activity
   "Evaluates body such that both *activity* and *context* are bound to the given activiy."
-  [^Activity activity & body]
+  [activity & body]
   `(binding [context/*context* ~activity
              *activity* ~activity]
      ~@body))
