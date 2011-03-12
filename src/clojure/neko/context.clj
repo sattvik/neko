@@ -115,6 +115,20 @@
     :post [(integer? %)]}
    (resolve-it name *context* type)))
 
+(defn get-id
+  "Finds the ID for the XML item with the given name.  This is simply a
+  convenient way of calling (resolve-resource context :id name)."
+  ([name]
+   {:pre  [(within-with-context?)
+           (resolvable? name)]
+    :post [(integer? %)]}
+   (resolve-id name *context*))
+  ([context name]
+   {:pre [(context? context)
+          (resolvable? name)]
+    :post [(integer? %)]}
+   (resolve-id name context)))
+
 (defn get-string
   "Gets the localized string with the given ID or name from the context.  If an
   integer ID is given, it will be used directly; otherwise, the name will be

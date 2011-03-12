@@ -17,13 +17,13 @@
               :methods [[testWithContext [] void]
                         [testResolveResource [] void]
                         [testGetString [] void]
+                        [testGetId [] void]
                         [testGetLayoutId [] void]
                         [testGetSystemService [] void]
-                        [testInflateLayout [] void]
-                        ]
+                        [testInflateLayout [] void]]
               :exposes-methods {setUp superSetUp})
   (:import android.content.Context
-           [com.sattvik.neko.test_app R$layout R$string])
+           [com.sattvik.neko.test_app R$id R$layout R$string])
   (:use neko.context
         junit.assert))
 
@@ -151,6 +151,24 @@
     (with-context @context
       (is-eq ok-string (get-string :android/ok))
       (is-eq copy-string (get-string :android/copy)))))
+
+(defn -testGetId
+  "Tests the get-id function."
+  [this]
+  (let [output-id R$id/output]
+    ; normal
+    (is-eq output-id (get-id @context :output))
+    (is-eq output-id (get-id @context output-id))
+    ; missing context
+    (does-throw AssertionError (get-id :output))
+    ; bad arguments
+    (does-throw AssertionError (get-id @context "foo"))
+    (does-throw AssertionError (get-id "foo" :output))
+    (with-context @context
+      (is-eq output-id (get-id :output))
+      (is-eq output-id (get-id output-id))
+      ; bad arguments
+      (does-throw AssertionError (get-id "foo")))))
 
 (defn -testGetLayoutId
   "Tests the get-layout function."
