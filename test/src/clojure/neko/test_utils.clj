@@ -14,7 +14,7 @@
   {:author "Daniel Solano Gómez"}
   (:import android.content.Intent))
 
-(defn start-intent
+(defn- start-intent
   "Returns a suitable start intent for activity unit test cases."
   []
   (doto (Intent.)
@@ -23,3 +23,8 @@
     (.setClassName "com.sattvik.neko.test_app"
                    "com.sattvik.neko.test_app.TestActivity")
     (.setAction Intent/ACTION_MAIN)))
+
+(defn start-activity
+  "Starts the activity for a test."
+  [test]
+  (.startActivity test (start-intent) nil nil))

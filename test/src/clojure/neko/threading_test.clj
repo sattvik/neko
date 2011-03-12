@@ -27,26 +27,22 @@
                         [testResultOf [] void]
                         [testExecWithArgs [] void]
                         [testOnProgressUpdate [] void]
-                        [testPublishOutOfContext [] void]]
-              :exposes-methods {setUp superSetUp})
+                        [testPublishOutOfContext [] void]])
   (:import [java.util.concurrent CountDownLatch TimeoutException TimeUnit])
   (:use [neko test-utils threading]
         junit.assert))
-
-(def activity (atom nil))
 
 (defn -init []
   [[com.sattvik.neko.test_app.TestActivity] nil])
 
 (defn -setUp [this]
-  (.superSetUp this)
-  (reset! activity (.startActivity this (start-intent) nil nil)))
+  (.superSetUp this))
 
 (defn -testRunOnUiThread [this]
   (let [ui-thread (Thread/currentThread)
         test-thread (atom nil)]
     ; should execute immediately
-    (run-on-ui-thread* @activity
+    (run-on-ui-thread* (start-activity)
       (fn [] (reset! test-thread (Thread/currentThread))))
     (is-eq ui-thread @test-thread)))
 
@@ -54,7 +50,7 @@
   (let [ui-thread (Thread/currentThread)
         test-thread (atom nil)]
     ; should execute immediately
-    (run-on-ui-thread @activity
+    (run-on-ui-thread (start-activity)
       (reset! test-thread (Thread/currentThread)))
     (is-eq ui-thread @test-thread)))
 
@@ -63,7 +59,7 @@
         count  (atom 0)
         run-me (reify Runnable
                  (run [this]
-                   (let [view (android.widget.Button. @activity)]
+                   (let [view (android.widget.Button. (start-activity))]
                      (when (post* view (fn [] (.countDown latch)))
                        (swap! count inc))
                      (when (post view (.countDown latch))
@@ -77,7 +73,7 @@
         count  (atom 0)
         run-me (reify Runnable
                  (run [this]
-                   (let [view (android.widget.Button. @activity)]
+                   (let [view (android.widget.Button. (start-activity))]
                      (when (post-delayed* view 100 (fn [] (.countDown latch)))
                        (swap! count inc))
                      (when (post-delayed view 100 (.countDown latch))
