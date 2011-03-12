@@ -12,7 +12,8 @@
 (ns neko.context
   "Utilities to aid in working with a context."
   {:author "Daniel Solano Gómez"}
-  (:import android.content.Context))
+  (:import android.content.Context)
+  (:use neko.-utils))
 
 (def 
   ^{:doc "The current context object to operate on."}
@@ -116,11 +117,7 @@
   ([^Context context type]
    ; using reflection here allows forward-compatibility
    (try
-     (let [field-name (.. (name type) (replace \- \_) toUpperCase
-                        (concat "_SERVICE"))
-           field      (.getField Context field-name)
-           value      (.get field nil)]
-       (.getSystemService context value))
+     (.getSystemService context (static-field-value Context type #(str % "_SERVICE")))
      (catch NoSuchFieldException _
        (throw (IllegalArgumentException.
                 (format "No service type '%s' exists." (name type))))))))
