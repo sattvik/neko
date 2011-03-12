@@ -19,6 +19,7 @@
                         [testGetString [] void]
                         [testGetLayoutId [] void]
                         [testGetSystemService [] void]
+                        [testInflateLayout [] void]
                         ]
               :exposes-methods {setUp superSetUp})
   (:import android.content.Context
@@ -196,3 +197,24 @@
   ; bad service name
   (does-throw IllegalArgumentException
               (get-system-service @context :neko)))
+
+(defn -testInflateLayout
+  "Tests the inflate-layoutfunction."
+  [this]
+  ; bad parameters: no id-or-name
+  (does-throw AssertionError (inflate-layout @context))
+  ; bad parameters: invalid id-or-name type
+  (does-throw AssertionError (inflate-layout @context "foo"))
+  ; non-existent resource
+  (does-throw IllegalArgumentException (inflate-layout @context :neko))
+  ; basic test of successful inflation
+  (is (instance? android.widget.RelativeLayout
+                 (inflate-layout @context :main)))
+  (with-context @context
+    ; bad parameters: invalid id-or-name type
+    (does-throw AssertionError (inflate-layout "foo"))
+    ; non-existent resource
+    (does-throw IllegalArgumentException (inflate-layout :neko))
+    ; basic test of successful inflation
+    (is (instance? android.widget.RelativeLayout
+                   (inflate-layout @context :main)))))

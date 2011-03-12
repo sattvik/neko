@@ -27,3 +27,9 @@
      (.get field nil)))
   ([class field]
    (static-field-value class field identity)))
+
+(defn integer-or-keyword?
+  "Convenient method for testing if the argument is an integer or a keyword."
+  [x]
+  (or (integer? x)
+      (keyword? x)))
