@@ -135,9 +135,9 @@
   [this]
   (reset! test-activity/set-content-view? false)
   (let [activity (start-activity this)]
-    (is-eq [true] (request-window-features! activity :progress))
+    (is (= [true] (request-window-features! activity :progress)))
     (with-activity activity
-      (is-eq [true] (request-window-features! :no-title)))))
+      (is (= [true] (request-window-features! :no-title))))))
 
 (defn -testRequestWindowFeaturesManyFeatures
   "Tests the request-window-features! requesting several features."
