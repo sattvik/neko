@@ -12,9 +12,11 @@
 (ns neko.activity
   "Utilities to aid in working with an activity."
   {:author "Daniel Solano Gómez"}
-  (:import android.app.Activity)
+  (:import android.app.Activity
+           android.view.View)
   (:require [neko.context :as context])
-  (:use neko.-utils))
+  (:use [neko.-protocols resolvable view-finder]
+        neko.-utils))
 
 (def 
   ^{:doc "The current activity to operate on."}
@@ -28,6 +30,22 @@
                *activity* activity#]
        ~@body)))
 
+(defn- activity?
+  "Determines whether the argument is an instance of Activity."
+  [x]
+  (instance? Activity x))
+
+(defn- within-with-activity?
+  "Ensures that the function is within a valid with-activity form."
+  []
+  (and (bound? #'*activity*)
+       (activity? *activity*)))
+
+(extend-type Activity
+  ViewFinder
+  (-find-view [activity id]
+    (.findViewById activity (resolve-id id activity))))
+
 (defn find-view
   "Finds a view that identified by the given ID.  Returns the view if found or
   nil otherwise.  The id-or-name argument may either be the integer ID or a
@@ -36,9 +54,17 @@
   If processed within a with-activity form, the activity argument may be
   omitted."
   ([id-or-name]
-   (find-view *activity* id-or-name))
-  ([^Activity activity id-or-name]
-   (.findViewById activity (context/resolve-resource activity :id id-or-name))))
+   {:pre  [(resolvable? id-or-name)
+           (within-with-activity?)]
+    :post [(or (nil? %)
+               (instance? View %))]}
+   (-find-view *activity* id-or-name))
+  ([activity id-or-name]
+   {:pre  [(activity? activity)
+           (resolvable? id-or-name)]
+    :post [(or (nil? %)
+               (instance? View %))]}
+   (-find-view activity id-or-name)))
 
 (defn set-content-view!
   "Sets the content for the activity.  The view may be one of:
@@ -48,18 +74,20 @@
   + A keyword used to resolve to a layout ID using
     (neko.context/resolve-resource)"
   ([view]
+   {:pre [(or (instance? View view)
+              (resolvable? view))]}
    (set-content-view! *activity* view))
   ([^Activity activity view]
-   {:pre [(or (instance? android.view.View view)
-              (integer? view)
-              (keyword? view))]}
+   {:pre [(activity? activity)
+          (or (instance? View view)
+              (resolvable? view))]}
    (cond
-     (instance? android.view.View view)
-       (.setContentView activity ^android.view.View view)
+     (instance? View view)
+       (.setContentView activity ^View view)
      (integer? view)
        (.setContentView activity ^Integer view)
      :else
-       (.setContentView activity ^Integer (context/resolve-resource activity :layout view)))))
+       (.setContentView activity ^Integer (resolve-layout view activity)))))
 
 (defn request-window-features!
   "Requests the given features for the activity.  The features should be
@@ -72,12 +100,18 @@
   is not necessary.
 
   This function should be called before set-content-view!."
-  [activity? & features]
-
+  {:arglists '([& features] [activity & features])}
+  [activity & features]
+  {:pre  [(or (activity? activity)
+              (and (keyword? activity)
+                   (within-with-activity?)))
+          (every? keyword? features)]
+   :post [%
+          (every? (fn [x] (instance? Boolean x)) %)]}
   (let [[^Activity activity features]
-          (if (instance? Activity activity?)
-            [activity? features]
-            [*activity* (cons activity? features)])
+          (if (instance? Activity activity)
+            [activity features]
+            [*activity* (cons activity features)])
         keyword->int (fn [k]
                        (static-field-value android.view.Window
                                            k

@@ -13,7 +13,8 @@
   "Utilities to aid in working with a context."
   {:author "Daniel Solano Gómez"}
   (:import android.content.Context)
-  (:use neko.-utils))
+  (:use neko.-protocols.resolvable
+        neko.-utils))
 
 (def 
   ^{:doc "The current context object to operate on."}
@@ -62,34 +63,16 @@
                          type
                          name)))))))
 
-(defprotocol Resolvable
-  "Protocol for resolving a resource given some sort of id, a context, and a
-  type."
-  (resolve-it [id context type])
-  (resolve-string [id context])
-  (resolve-layout [id context]))
-
-(extend-protocol Resolvable
-  Integer
-  (resolve-it [id _1 _2] id)
-  (resolve-string [id _] id)
-  (resolve-layout [id _] id)
-
-
-  clojure.lang.Keyword
+(extend-type clojure.lang.Keyword
+  Resolvable
   (resolve-it
     [name context type] (resolve-from-keyword context type name))
+  (resolve-id
+    [name context] (resolve-from-keyword context :id name))
   (resolve-string
     [name context] (resolve-from-keyword context :string name))
   (resolve-layout
-    [name context] (resolve-from-keyword context :layout name))
-  )
-
-(defn- resolvable?
-  "Determines whether the argument represents an argument that can be resolved
-  as a resource."
-  [x]
-  (satisfies? Resolvable x))
+    [name context] (resolve-from-keyword context :layout name)))
 
 (defn resolve-resource
   "Resolves the resource ID of a given type with the given name.  For example,
