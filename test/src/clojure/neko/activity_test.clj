@@ -24,44 +24,46 @@
                         [testSetContentViewWithNameNoContext [] void]
                         [testSetContentViewWithView [] void]
                         [testSetContentViewWithViewNoContext [] void]
-                        ]
-              :exposes-methods {setUp superSetUp})
-  (:import com.sattvik.neko.test_app.R$id)
+                        [testRequestWindowFeaturesNoFeatures [] void]
+                        [testRequestWindowFeaturesOneFeature [] void]
+                        [testRequestWindowFeaturesManyFeatures [] void]
+                        [testRequestWindowFeaturesManyFeaturesInContext [] void]
+                        [testRequestWindowFeaturesBadFeatures [] void]
+                        ])
+  (:import android.view.Window
+           com.sattvik.neko.test_app.R$id)
+  (:require [com.sattvik.neko.test_app.TestActivity :as test-activity])
   (:use [neko activity
               [context :only [*context*]]
               test-utils]
         neko.test-utils
         junit.assert))
 
-(def activity (atom nil))
-
 (defn -init []
   [[com.sattvik.neko.test_app.TestActivity] nil])
-
-(defn -setUp [this]
-  (.superSetUp this)
-  (reset! activity (.startActivity this (start-intent) nil nil)))
 
 (defn -testWithActivity
   "Test that the with-activity macro."
   [this]
-  (is-not (bound? #'*context*))
-  (is-not (bound? #'*activity*))
-  (with-activity @activity
-    (is-same @activity *context*)
-    (is-same @activity *activity*))
-  (is-not (bound? #'*context*))
-  (is-not (bound? #'*activity*)))
+  (let [activity (start-activity this)]
+    (is-not (bound? #'*context*))
+    (is-not (bound? #'*activity*))
+    (with-activity activity
+      (is-same activity *context*)
+      (is-same activity *activity*))
+    (is-not (bound? #'*context*))
+    (is-not (bound? #'*activity*))))
 
 (defn -testFindView
   "Tests the find-view function."
   [this]
-  (let [output-view (.findViewById @activity R$id/output)]
+  (let [activity (start-activity this)
+        output-view (.findViewById activity R$id/output)]
     ; keyword
-    (is-same output-view (find-view @activity :output))
+    (is-same output-view (find-view activity :output))
     ; id
-    (is-same output-view (find-view @activity R$id/output))
-    (with-activity @activity
+    (is-same output-view (find-view activity R$id/output))
+    (with-activity activity
       (is-same output-view (find-view :output))
       (is-same output-view (find-view R$id/output)))))
 
@@ -69,7 +71,7 @@
   "Tests the set-content-view! function using an ID within a with-activiity
   context."
   [this]
-  (with-activity @activity
+  (with-activity (start-activity this)
     (is-nil (find-view :android/text1))
     (set-content-view! android.R$layout/simple_list_item_1)
     (is-not-nil (find-view :android/text1))))
@@ -77,15 +79,16 @@
 (defn -testSetContentViewWithIDNoContext
   "Tests the set-content-view! function using an ID."
   [this]
-  (is-nil (find-view @activity :android/text1))
-  (set-content-view! @activity android.R$layout/simple_list_item_1)
-  (is-not-nil (find-view @activity :android/text1)))
+  (let [activity (start-activity this)]
+    (is-nil (find-view activity :android/text1))
+    (set-content-view! activity android.R$layout/simple_list_item_1)
+    (is-not-nil (find-view activity :android/text1))))
 
 (defn -testSetContentViewWithName
   "Tests the set-content-view! function using a keyword name within a
   with-activiity context."
   [this]
-  (with-activity @activity
+  (with-activity (start-activity this)
     (is-nil (find-view :android/text1))
     (set-content-view! :android/simple_list_item_1)
     (is-not-nil (find-view :android/text1))))
@@ -93,27 +96,71 @@
 (defn -testSetContentViewWithNameNoContext
   "Tests the set-content-view! function using a keyword name."
   [this]
-  (is-nil (find-view @activity :android/text1))
-  (set-content-view! @activity :android/simple_list_item_1)
-  (is-not-nil (find-view @activity :android/text1)))
+  (let [activity (start-activity this)]
+    (is-nil (find-view activity :android/text1))
+    (set-content-view! activity :android/simple_list_item_1)
+    (is-not-nil (find-view activity :android/text1))))
 
 (defn -testSetContentViewWithView
   "Tests the set-content-view! function using a view object within a
   with-activiity context."
   [this]
-  (with-activity @activity
-    (is-nil (find-view :android/text1))
-    (set-content-view! (.. @activity
-                           getLayoutInflater
-                           (inflate android.R$layout/simple_list_item_1 nil)))
-    (is-not-nil (find-view :android/text1))))
+  (let [activity (start-activity this)]
+    (with-activity activity
+      (is-nil (find-view :android/text1))
+      (set-content-view! (.. activity
+                             getLayoutInflater
+                             (inflate android.R$layout/simple_list_item_1 nil)))
+      (is-not-nil (find-view :android/text1)))))
 
 (defn -testSetContentViewWithViewNoContext
   "Tests the set-content-view! function using a view object."
   [this]
-  (is-nil (find-view @activity :android/text1))
-  (set-content-view! @activity
-                     (.. @activity
-                         getLayoutInflater
-                         (inflate android.R$layout/simple_list_item_1 nil)))
-  (is-not-nil (find-view @activity :android/text1)))
+  (let [activity (start-activity this)]
+    (is-nil (find-view activity :android/text1))
+    (set-content-view! activity
+                       (.. activity
+                           getLayoutInflater
+                           (inflate android.R$layout/simple_list_item_1 nil)))
+    (is-not-nil (find-view activity :android/text1))))
+
+(defn -testRequestWindowFeaturesNoFeatures
+  "Tests the request-window-features! without requesting any features."
+  [this]
+  (let [activity (start-activity this)]
+    (is (= [] (request-window-features! activity)))))
+
+(defn -testRequestWindowFeaturesOneFeature
+  "Tests the request-window-features! function with only one feature."
+  [this]
+  (reset! test-activity/set-content-view? false)
+  (let [activity (start-activity this)]
+    (is-eq [true] (request-window-features! activity :progress))
+    (with-activity activity
+      (is-eq [true] (request-window-features! :no-title)))))
+
+(defn -testRequestWindowFeaturesManyFeatures
+  "Tests the request-window-features! requesting several features."
+  [this]
+  (reset! test-activity/set-content-view? false)
+  (let [activity (start-activity this)]
+    (is (= [true true true]
+           (request-window-features! activity :progress :no-title
+                                     :indeterminate-progress)))))
+
+(defn -testRequestWindowFeaturesManyFeaturesInContext
+  "Tests the request-window-features! requesting several features in an
+  with-activity context."
+  [this]
+  (reset! test-activity/set-content-view? false)
+  (with-activity (start-activity this)
+    (is (= [true true true]
+           (request-window-features! :progress :no-title
+                                     :indeterminate-progress)))))
+
+(defn -testRequestWindowFeaturesBadFeatures
+  "Tests the request-window-features! with bad features."
+  [this]
+  (reset! test-activity/set-content-view? false)
+  (does-throw RuntimeException
+    (request-window-features! (start-activity this) :neko)))

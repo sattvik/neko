@@ -15,8 +15,10 @@
               :exposes-methods {onCreate superOnCreate})
   (:import com.sattvik.neko.test_app.R$layout))
 
+(def set-content-view? (atom true))
+
 (defn -onCreate
   [this bundle]
-  (doto this
-    (.superOnCreate bundle)
-    (.setContentView R$layout/main)))
+  (.superOnCreate this bundle)
+  (when @set-content-view?
+    (.setContentView this R$layout/main)))
