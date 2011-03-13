@@ -83,8 +83,8 @@
   key-code: the code for the physical key that was pressed
   event:    the KeyEvent object containing full information about the event
 
-  The function should evaluate to a truthy value if it has consumed the event,
-  nil or false otherwise."
+  The function should evaluate to a logical true value if it has consumed the
+  event, otherwise logical false."
   [handler-fn]
   (reify android.content.DialogInterface$OnKeyListener
     (onKey [this dialog key-code event]
@@ -99,8 +99,8 @@
   key-code: the code for the physical key that was pressed
   event:    the KeyEvent object containing full information about the event
 
-  The body should evaluate to a truthy value if it has consumed the event, nil
-  or false otherwise."
+  The body should evaluate to a logical true value if it has consumed the
+  event, otherwise logical false."
   [& body]
   `(on-key-call (fn [~'dialog ~'key-code ~'event] ~@body)))
 

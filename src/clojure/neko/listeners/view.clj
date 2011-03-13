@@ -104,8 +104,8 @@
   key-code: the code for the physical key that was pressed
   event:    the KeyEvent object containing full information about the event
 
-  The function should evaluate to a truthy value if it has consumed the event.
-  Otherwise, it should evaluate to false or nil."
+  The function should evaluate to a logical true value if it has consumed the
+  event, otherwise logical false."
   [handler-fn]
   (reify android.view.View$OnKeyListener
     (onKey [this view key-code event]
@@ -119,8 +119,8 @@
   key-code: the code for the physical key that was pressed
   event:    the KeyEvent object containing full information about the event
 
-  The body should evaluate to a truthy value if it has consumed the event.
-  Otherwise, it should evaluate to false or nil."
+  The body should evaluate to a logical true value if it has consumed the
+  event, otherwise logical false."
   [& body]
   `(on-key-call (fn [~'view ~'key-code ~'event] ~@body)))
 
@@ -157,8 +157,8 @@
 (defn on-long-click-call
   "Takes a function and yields a View.OnLongClickListener object that will
   invoke the function.  This function must take one argument, the view that was
-  clicked, and must evaluate to a truthy value if it has consumed the long
-  click, false or nil otherwise."
+  clicked, and must evaluate to a logical true value if it has consumed the
+  long click, otherwise logical false."
   [handler-fn]
   (reify android.view.View$OnLongClickListener
     (onLongClick [this view]
@@ -168,7 +168,7 @@
   "Takes a body of expressions and yields a View.OnLongClickListener object
   that will invoke the body.  The body takes an implicit argument 'view' that
   is the view that was clicked and held.  The body should also evaluate to a
-  truthy value if it consumes the long click, false or nil otherwise."
+  logical true value if it consumes the long click, otherwise logical false."
   [& body]
   `(on-long-click-call (fn [~'view] ~@body)))
 
@@ -198,8 +198,8 @@
   view:  the view the touch event has been dispatched to
   event: the MotionEvent object containing full information about the event
 
-  It should also evaluate to a truthy value if it consumes the event, false or
-  nil otherwise."
+  The function should evaluate to a logical true value if it consumes the
+  event, otherwise logical false."
   [handler-fn]
   (reify android.view.View$OnTouchListener
     (onTouch [this view event]
@@ -212,7 +212,7 @@
   view:  the view the touch event has been dispatched to
   event: the MotionEvent object containing full information about the event
   
-  It should also evaluate to a truthy value if it consumes the event, false or
-  nil otherwise."
+  The body should evaluate to a logical value if it consumes the event,
+  otherwise logical false."
   [& body]
   `(on-touch-call (fn [~'view ~'event] ~@body)))

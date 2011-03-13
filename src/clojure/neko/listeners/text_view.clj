@@ -26,8 +26,8 @@
   key-event  if triggered by an enter key, this is the event; otherwise, this
              is nil
 
-  The function should return a truthy value if it has consumed the action,
-  otherwise false or nil."
+  The function should evaluate to a logical true value if it has consumed the
+  action, otherwise logical false."
   [handler-fn]
   {:pre  [(fn? handler-fn)]
    :post [(instance? android.widget.TextView$OnEditorActionListener %)]}
@@ -47,7 +47,7 @@
   key-event  if triggered by an enter key, this is the event; otherwise, this
              is nil
 
-  The body should evaluate a truthy value if it has consumed the action,
-  otherwise false or nil."
+  The body should evaluate to a logical true value if it has consumed the
+  action, otherwise logical false."
   [& body]
   `(on-editor-action-call (fn [~'view ~'action-id ~'key-event] ~@body)))

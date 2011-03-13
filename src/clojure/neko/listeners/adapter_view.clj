@@ -52,8 +52,8 @@
   position  the position of the view in the adapter
   id        the row id of the item that was clicked
 
-  The function should evaluate to a truthy value if it has consumed the long
-  click; otherwise false or nil."
+  The function should evaluate to a logical true value if it has consumed the
+  long click; otherwise logical false."
   [handler-fn]
   {:pre  [(fn? handler-fn)]
    :post [(instance? android.widget.AdapterView$OnItemLongClickListener %)]}
@@ -71,8 +71,8 @@
   position  the position of the view in the adapter
   id        the row id of the item that was clicked
 
-  The body should evaluate to a truthy value if it has consumed the long click;
-  otherwise false or nil."
+  The body should evaluate to a logical true value if it has consumed the long
+  click; otherwise logical false."
   [& body]
   `(on-item-long-click-call (fn [~'parent ~'view ~'position ~'id] ~@body)))
 

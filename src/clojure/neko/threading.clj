@@ -58,7 +58,7 @@
   `(post-delayed* ~view ~millis (fn [] ~@body)))
 
 (defn on-ui-thread?
-  "Returns a truthy value if the current thread is a UI thread."
+  "Returns a logical true value if the current thread is a UI thread."
   []
   (android.os.Looper/myLooper))
 
