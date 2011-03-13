@@ -20,13 +20,13 @@
   ^{:doc "The current context object to operate on."}
   *context*)
 
-(defn- context?
-  "Determines whether the argument is an instance of Context."
+(defn context?
+  "Predict to determine if the is an instance of Context."
   [x]
   (instance? Context x))
 
-(defn- within-with-context?
-  "Ensures that the function is within a valid with-context form."
+(defn has-*context*?
+  "Tests that the caller has a valid binding for *context*."
   []
   (and (bound? #'*context*)
        (context? *context*)))
@@ -109,7 +109,7 @@
     :post [(integer? %)]}
    (resolve-it name context type))
   ([type name]
-   {:pre  [(within-with-context?)
+   {:pre  [(has-*context*?)
            (keyword? type)
            (resolvable? name)]
     :post [(integer? %)]}
@@ -119,7 +119,7 @@
   "Finds the ID for the XML item with the given name.  This is simply a
   convenient way of calling (resolve-resource context :id name)."
   ([name]
-   {:pre  [(within-with-context?)
+   {:pre  [(has-*context*?)
            (resolvable? name)]
     :post [(integer? %)]}
    (resolve-id name *context*))
@@ -140,14 +140,14 @@
   If within a with-context form, the context parameter may be omitted."
   {:arglists '([context? id-or-name & args])}
   ([id-or-name]
-   {:pre  [(within-with-context?)
+   {:pre  [(has-*context*?)
            (resolvable? id-or-name)]
     :post [(string? %)]}
    (get-string *context* id-or-name))
   ([context id-or-name]
    {:pre  [(or (and (context? context)
                     (resolvable? id-or-name))
-               (and (within-with-context?)
+               (and (has-*context*?)
                     (resolvable? context)))]
     :post [(string? %)]}
    (if (instance? Context context)
@@ -156,7 +156,7 @@
   ([context id-or-name & args]
    {:pre  [(or (and (context? context)
                     (resolvable? id-or-name))
-               (and (within-with-context?)
+               (and (has-*context*?)
                     (resolvable? context)))]
     :post [(string? %)]}
    (if (instance? Context context)
@@ -169,7 +169,7 @@
   "Finds the resource ID for the layout with the given name.  This is simply a
   convenient way of calling (resolve-resource context :layout name)."
   ([name]
-   {:pre  [(within-with-context?)
+   {:pre  [(has-*context*?)
            (resolvable? name)]
     :post [(integer? %)]}
    (resolve-layout name *context*))
@@ -185,7 +185,7 @@
   :layout-inflater for the layout inflater service.  If within a with-context
   form, the context may be omitted."
   ([type]
-   {:pre [(within-with-context?)]}
+   {:pre [(has-*context*?)]}
    (get-system-service *context* type))
   ([^Context context type]
    {:pre [(keyword? type)
@@ -202,7 +202,7 @@
   be an integer ID or a keyword name for the desired layout.  If within a
   with-context form, the context may be omitted."
   ([id-or-name]
-   {:pre  [(within-with-context?)
+   {:pre  [(has-*context*?)
            (resolvable? id-or-name)]
     :post [(instance? android.view.View %)]}
    (get-layout *context* id-or-name))
