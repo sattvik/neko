@@ -30,13 +30,13 @@
                *activity* activity#]
        ~@body)))
 
-(defn- activity?
+(defn activity?
   "Determines whether the argument is an instance of Activity."
   [x]
   (instance? Activity x))
 
-(defn- within-with-activity?
-  "Ensures that the function is within a valid with-activity form."
+(defn has-*activity*?
+  "Ensures that the calling context has a valid *activity* var."
   []
   (and (bound? #'*activity*)
        (activity? *activity*)))
@@ -55,7 +55,7 @@
   omitted."
   ([id-or-name]
    {:pre  [(resolvable? id-or-name)
-           (within-with-activity?)]
+           (has-*activity*?)]
     :post [(or (nil? %)
                (instance? View %))]}
    (-find-view *activity* id-or-name))
@@ -104,7 +104,7 @@
   [activity & features]
   {:pre  [(or (activity? activity)
               (and (keyword? activity)
-                   (within-with-activity?)))
+                   (has-*activity*?)))
           (every? keyword? features)]
    :post [%
           (every? (fn [x] (instance? Boolean x)) %)]}
