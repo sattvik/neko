@@ -37,43 +37,6 @@
   `(binding [*context* ~context]
      ~@body))
 
-(defn- resolve-from-keyword
-  "Resolves a resource reprensented as a keyword."
-  [^Context context type name]
-  {:pre  [(context? context)
-          (keyword? type)
-          (keyword? name)]
-   :post [(integer? %)]}
-  (let [package (or (namespace name) (.getPackageName context))
-        type    (clojure.core/name type)
-        name    (.. (clojure.core/name name) (replace \- \_) (replace \. \_))]
-    (try
-      (let [class   (Class/forName (str package ".R$" type))
-            field   (.getField class name)]
-        (.getInt field nil))
-      (catch ClassNotFoundException _
-        (throw (IllegalArgumentException.
-                 (format "Could not find class corresponding to '%s.R.%s'"
-                         package
-                         type))))
-      (catch NoSuchFieldException _
-        (throw (IllegalArgumentException.
-                 (format "Resource not found: '%s.R.%s.%s'"
-                         package
-                         type
-                         name)))))))
-
-(extend-type clojure.lang.Keyword
-  Resolvable
-  (resolve-it
-    [name context type] (resolve-from-keyword context type name))
-  (resolve-id
-    [name context] (resolve-from-keyword context :id name))
-  (resolve-string
-    [name context] (resolve-from-keyword context :string name))
-  (resolve-layout
-    [name context] (resolve-from-keyword context :layout name)))
-
 (defn resolve-resource
   "Resolves the resource ID of a given type with the given name.  For example,
   to refer to what in Java would be R.string.my_string, you can use:

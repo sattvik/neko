@@ -11,7 +11,34 @@
 
 (ns neko.-protocols.resolvable
   "Home of the Resolvable protocol and related utilities."
-  {:author "Daniel Solano Gómez"})
+  {:author "Daniel Solano Gómez"}
+  (:import android.content.Context))
+
+(defn- resolve-from-keyword
+  "Resolves a resource reprensented as a keyword."
+  [context type name]
+  {:pre  [(instance? Context context)
+          (keyword? type)
+          (keyword? name)]
+   :post [(integer? %)]}
+  (let [package (or (namespace name) (.getPackageName ^Context context))
+        type    (clojure.core/name type)
+        name    (.. (clojure.core/name name) (replace \- \_) (replace \. \_))]
+    (try
+      (let [class   (Class/forName (str package ".R$" type))
+            field   (.getField class name)]
+        (.getInt field nil))
+      (catch ClassNotFoundException _
+        (throw (IllegalArgumentException.
+                 (format "Could not find class corresponding to '%s.R.%s'"
+                         package
+                         type))))
+      (catch NoSuchFieldException _
+        (throw (IllegalArgumentException.
+                 (format "Resource not found: '%s.R.%s.%s'"
+                         package
+                         type
+                         name)))))))
 
 (defprotocol Resolvable
   "Protocol for resolving a resource given some sort of id, a context, and a
@@ -21,12 +48,22 @@
   (resolve-string [id context])
   (resolve-layout [id context]))
 
-(extend-type Integer
-  Resolvable
+(extend-protocol Resolvable
+  Integer
   (resolve-it [id _1 _2] id)
   (resolve-id [id _] id)
   (resolve-string [id _] id)
-  (resolve-layout [id _] id))
+  (resolve-layout [id _] id)
+
+  clojure.lang.Keyword
+  (resolve-it
+    [name context type] (resolve-from-keyword context type name))
+  (resolve-id
+    [name context] (resolve-from-keyword context :id name))
+  (resolve-string
+    [name context] (resolve-from-keyword context :string name))
+  (resolve-layout
+    [name context] (resolve-from-keyword context :layout name)))
 
 (defn resolvable?
   "Determines whether the argument represents an argument that can be resolved
