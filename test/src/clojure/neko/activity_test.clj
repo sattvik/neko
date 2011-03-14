@@ -17,7 +17,6 @@
               :constructors {[] [Class]}
               :extends android.test.ActivityUnitTestCase
               :methods [[testWithActivity [] void]
-                        [testFindView [] void]
                         [testSetContentViewWithID [] void]
                         [testSetContentViewWithIDNoContext [] void]
                         [testSetContentViewWithName [] void]
@@ -28,13 +27,13 @@
                         [testRequestWindowFeaturesOneFeature [] void]
                         [testRequestWindowFeaturesManyFeatures [] void]
                         [testRequestWindowFeaturesManyFeaturesInContext [] void]
-                        [testRequestWindowFeaturesBadFeatures [] void]
-                        ])
+                        [testRequestWindowFeaturesBadFeatures [] void]])
   (:import android.view.Window
            com.sattvik.neko.test_app.R$id)
   (:require [com.sattvik.neko.test_app.TestActivity :as test-activity])
   (:use [neko activity
               [context :only [*context*]]
+              find-view
               test-utils]
         neko.test-utils
         junit.assert))
@@ -53,19 +52,6 @@
       (is-same activity *activity*))
     (is-not (bound? #'*context*))
     (is-not (bound? #'*activity*))))
-
-(defn -testFindView
-  "Tests the find-view function."
-  [this]
-  (let [activity (start-activity this)
-        output-view (.findViewById activity R$id/output)]
-    ; keyword
-    (is-same output-view (find-view activity :output))
-    ; id
-    (is-same output-view (find-view activity R$id/output))
-    (with-activity activity
-      (is-same output-view (find-view :output))
-      (is-same output-view (find-view R$id/output)))))
 
 (defn -testSetContentViewWithID
   "Tests the set-content-view! function using an ID within a with-activiity

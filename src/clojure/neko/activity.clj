@@ -15,7 +15,8 @@
   (:import android.app.Activity
            android.view.View)
   (:require [neko.context :as context])
-  (:use [neko.-protocols resolvable view-finder]
+  (:use neko.find-view
+        neko.-protocols.resolvable
         neko.-utils))
 
 (def 
@@ -40,31 +41,6 @@
   []
   (and (bound? #'*activity*)
        (activity? *activity*)))
-
-(extend-type Activity
-  ViewFinder
-  (-find-view [activity id]
-    (.findViewById activity (resolve-id id activity))))
-
-(defn find-view
-  "Finds a view that identified by the given ID.  Returns the view if found or
-  nil otherwise.  The id-or-name argument may either be the integer ID or a
-  keyword name.
-
-  If processed within a with-activity form, the activity argument may be
-  omitted."
-  ([id-or-name]
-   {:pre  [(resolvable? id-or-name)
-           (has-*activity*?)]
-    :post [(or (nil? %)
-               (instance? View %))]}
-   (-find-view *activity* id-or-name))
-  ([activity id-or-name]
-   {:pre  [(activity? activity)
-           (resolvable? id-or-name)]
-    :post [(or (nil? %)
-               (instance? View %))]}
-   (-find-view activity id-or-name)))
 
 (defn set-content-view!
   "Sets the content for the activity.  The view may be one of:
