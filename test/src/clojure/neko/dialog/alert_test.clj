@@ -15,12 +15,15 @@
   (:gen-class :main false
               :extends android.test.AndroidTestCase
               :methods [[testNewBuilder [] void]
+                        [testBasicCreate [] void]
                         ]
               :exposes-methods {setUp superSetUp}
               )
-  (:import neko.dialog.alert.FunctionalAlertDialogBuilder)
+  (:import android.app.AlertDialog$Builder
+           neko.dialog.alert.FunctionalAlertDialogBuilder)
   (:use junit.assert
         neko.context
+        neko.find-view
         neko.dialog.alert
         )
   )
@@ -42,7 +45,16 @@
   (does-throw AssertionError (new-builder "neko"))
   (is (instance? FunctionalAlertDialogBuilder (new-builder @context)))
   (with-context @context
-    (is (instance? FunctionalAlertDialogBuilder (new-builder))))
+    (is (instance? FunctionalAlertDialogBuilder (new-builder)))))
 
-
-  )
+(defn -testBasicCreate
+  "Tests that the create function works with no other set-up."
+  [this]
+  (let [test-builder (fn [builder]
+                       ; a simple test that just ensures a view exists
+                       (let [dialog (create builder)]
+                         (is-not-nil (find-view dialog :android/icon))))]
+    ; test with android builder
+    (test-builder (AlertDialog$Builder. @context))
+    ; test with functional builder
+    (test-builder (new-builder @context))))
