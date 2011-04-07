@@ -35,7 +35,6 @@
               [context :only [*context*]]
               find-view
               test-utils]
-        neko.test-utils
         junit.assert))
 
 (defn -init []
