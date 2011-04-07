@@ -27,15 +27,35 @@
   "Defines the functionality needed to build new alert dialogues."
   (create [builder]
     "Actually creates the AlertDialog.")
+  (with-cancellation [builder cancellable?]
+    "Sets whether or not the dialog may be cancelled.")
   )
 
 (defrecord FunctionalAlertDialogBuilder
-  [^android.content.Context context]
+  [^android.content.Context context
+   ^boolean cancellable])
+
+(defn- new-builder?
+  "Predicate used for testing whether a new builder is a functional builder but
+  is different from the original builder."
+  [old-builder new-builder]
+  (and (instance? FunctionalAlertDialogBuilder old-builder)
+       (not (identical? old-builder new-builder))))
+
+(extend-type FunctionalAlertDialogBuilder
   AlertDialogBuilder
-  (create [_]
-    #_{:post [(instance? android.app.AlertDialog %)]}
-    (let [builder (AlertDialog$Builder. context)]
+  (create [this]
+    {:post [(instance? android.app.AlertDialog %)]}
+    (let [^AlertDialog$Builder builder (AlertDialog$Builder. (.context this))]
+      (doto builder
+        (.setCancelable (.cancellable this))
+        )
       (.create builder)))
+
+  (with-cancellation [this cancellable?]
+    {:post [(new-builder? this %)
+            (= (:cancellable %) cancellable?)]}
+    (assoc this :cancellable (boolean cancellable?)))
   )
 
 (extend-type AlertDialog$Builder
@@ -43,6 +63,10 @@
   (create [this]
     {:post [(instance? android.app.AlertDialog %)]}
     (.create this))
+
+  (with-cancellation [this cancellable?]
+    {:post [(identical? this %)]}
+    (.setCancelable this (boolean cancellable?)))
   )
 
 (defn new-builder
@@ -55,4 +79,4 @@
   ([context]
    {:pre  [(context? context)]
     :post [(instance? FunctionalAlertDialogBuilder %)]}
-   (FunctionalAlertDialogBuilder. context)))
+   (FunctionalAlertDialogBuilder. context true)))
