@@ -27,6 +27,9 @@
   "Defines the functionality needed to build new alert dialogues."
   (create [builder]
     "Actually creates the AlertDialog.")
+  (get-builder-object [builder]
+    "Returns an instance of AlertDialog.Builder with the properties from this
+    builder.")
   (with-cancellation [builder cancellable?]
     "Sets whether or not the dialog may be cancelled.")
   )
@@ -46,11 +49,13 @@
   AlertDialogBuilder
   (create [this]
     {:post [(instance? android.app.AlertDialog %)]}
-    (let [^AlertDialog$Builder builder (AlertDialog$Builder. (.context this))]
-      (doto builder
-        (.setCancelable (.cancellable this))
-        )
-      (.create builder)))
+    (.create (get-builder-object this)))
+
+  (get-builder-object [this]
+    {:post [(instance? AlertDialog$Builder %)]}
+    (doto (AlertDialog$Builder. (.context this))
+      (.setCancelable (.cancellable this))
+      ))
 
   (with-cancellation [this cancellable?]
     {:post [(new-builder? this %)
@@ -63,6 +68,10 @@
   (create [this]
     {:post [(instance? android.app.AlertDialog %)]}
     (.create this))
+
+  (get-builder-object [this]
+    {:post [(identical? this %)]}
+    this)
 
   (with-cancellation [this cancellable?]
     {:post [(identical? this %)]}

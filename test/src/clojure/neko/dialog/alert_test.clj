@@ -16,6 +16,8 @@
               :extends android.test.InstrumentationTestCase
               :methods [[^{android.test.UiThreadTest {}} testNewBuilder [] void]
                         [^{android.test.UiThreadTest {}} testBasicCreate [] void]
+                        [^{android.test.UiThreadTest {}} testGetBuilderObjectWithObject [] void]
+                        [^{android.test.UiThreadTest {}} testGetBuilderObjectFunctional [] void]
                         [testCancellationDefaultWithObject [] void]
                         [testCancellationTrueWithObject [] void]
                         [testCancellationFalseWithObject [] void]
@@ -95,7 +97,30 @@
     ; test with functional builder
     (test-builder (new-builder @activity))))
 
-(defn test-cancellation
+
+; ----------------------------------------------------------------------
+; ---   Test get-builder-object                                      ---
+; ----------------------------------------------------------------------
+
+(defn -testGetBuilderObjectWithObject
+  "Tests the get-builder-object function with the object-based builder."
+  [this]
+  (let [builder (AlertDialog$Builder. @activity)]
+    (is (identical? builder (get-builder-object builder)))))
+
+(defn -testGetBuilderObjectFunctional
+  "Tests the get-builder-object function with the functional builder."
+  [this]
+  (let [builder (new-builder @activity)]
+    (is (instance? AlertDialog$Builder (get-builder-object builder)))))
+
+
+; ----------------------------------------------------------------------
+; ---   Test with-cancellation                                       ---
+; ----------------------------------------------------------------------
+
+(defn- test-cancellation
+  "Helper function used to test cancellation"
   [build-fn cancellable?]
   (let [dialog (atom nil)
         latch  (CountDownLatch. 1)
