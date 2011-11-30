@@ -50,7 +50,16 @@ __ https://github.com/sattvik/clojure/tree/android-1.2.x
 
 Android SDK Tools
   Neko has been developed with the latest revision of the Android SDK tools,
-  but should generally be compatible with all recent versions.
+  and is compatible with r14 and up of the Android SDK.
+
+.. WARNING::
+   Revision 14 of the Android SDK introduced some major changes in the Ant
+   build system.  Neko has been updated to use the new build system.  You will
+   probably need to change your project if you have been using an older version
+   of Neko/SDK.  For more detailed information, `check the Android Tools
+   Project Site`__.
+
+__ http://tools.android.com/recent/buildchangesinrevision14
 
 Android Platform SDK 7 (2.1/Eclair) or newer
   In order to maintain backwards-compatibility, Neko does not support any APIs
@@ -66,14 +75,23 @@ project’s build and allow you to use the libraries within your application.
 Build support
 -------------
 
-To use Neko’s build support for Clojure, you will need to modify your project’s
-``build.xml`` file by adding a line to similar to the following::
+To use Neko’s build support for Clojure, you will need to make two
+modifications to your project’s
+``build.xml`` file.
 
-  <import file="/path/to/neko/build-support/clojure.xml"/>
+1. You must add a line to similar to the following
+   **before the line with
+   ``<import file="${sdk.dir}/tools/ant/build.xml" />``**.::
 
-The important thing is that the value of the ``file`` attribute should resolve
-to the ``clojure.xml`` in the ``built-support`` directory of this repository.
-It may be either a relative or absolute path.
+     <import file="/path/to/neko/build-support/clojure.xml"/>
+
+   The important thing is that the value of the ``file`` attribute should
+   resolve to the ``clojure.xml`` in the ``build-support`` directory of this
+   repository.  It may be either a relative or absolute path.
+
+2. You must find the line that reads ``<!-- version-tag: 1 -->`` and change the
+   ``1`` to ``custom``.  If you do not do this, Android may overwrite your
+   changes.
 
 For most projects, that is all you have to do.  So long as your Clojure source
 files are in ``src/clojure`` and you have placed a Clojure JAR file in

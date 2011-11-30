@@ -36,58 +36,95 @@
         <mkdir dir="${clojure.out.classes.absolute.dir}"/>
     </target>
 
-    <target name="-clojure-compile">
-        <condition property="libs.ref"
-                value="android.libraries.jars"
-                else="jar.libs.ref">
-            <isset property="android.library"/>
-        </condition>
-        <condition property="libs.dir"
-                value="./libs"
-                else="${jar.libs.dir}">
-            <isset property="android.library"/>
-        </condition>
-        <condition property="extensible.classpath"
-                value="${tested.project.absolute.dir}/bin/classes"
-                else=".">
-            <isset property="tested.project.absolute.dir" />
-        </condition>
-        <condition property="extensible.libs.classpath"
-                value="${tested.project.absolute.dir}/libs"
-                else="${libs.dir}">
-            <isset property="tested.project.absolute.dir" />
-        </condition>
-        <condition property="clojure.warn.reflection.env"
-                value="${clojure.warn.reflection}"
-                else="false">
-            <isset property="clojure.warn.reflection"/>
-        </condition>
-        <pathconvert property="clojure.project.libraries.src"
-                refid="project.libraries.src">
-            <globmapper from="*/src/java" to="*/src/clojure"/>
-        </pathconvert>
-        <java classname="clojure.main"
-                classpath="${clojure.jar}"
-                classpathref="android.target.classpath"
-                fork="true"
-                failonerror="true">
-            <sysproperty key="clojure.compile.path" value="${clojure.out.classes.absolute.dir}"/>
-            <sysproperty key="clojure.warn.reflection" value="${clojure.warn.reflection.env}"/>
-            <classpath>
-                <pathelement path="${extensible.classpath}"/>
-                <pathelement path="${clojure.source.absolute.dir}"/>
-                <path refid="${libs.ref}"/>
-                <pathelement path="${clojure.project.libraries.src}"/>
-                <fileset dir="${extensible.libs.classpath}" includes="*.jar" />
-                <pathelement path="${out.classes.absolute.dir}"/>
-            </classpath>
-            <arg file="${android-clojure-support.dir}/clojure-compile.clj"/>
-            <arg path="${clojure.source.absolute.dir}"/>
-            <arg path="${clojure.project.libraries.src}"/>
-        </java>
-    </target>
+    <!-- Compiles this project's .java files into .class files. -->
+    <target name="-compile" depends="-build-setup, -pre-build, -code-gen, -pre-compile">
+        <do-only-if-manifest-hasCode elseText="hasCode = false. Skipping...">
+            <!-- If android rules are used for a test project, its classpath should include
+                 tested project's location -->
+            <condition property="extensible.classpath"
+                    value="${tested.project.absolute.dir}/bin/classes"
+                    else=".">
+                <isset property="tested.project.absolute.dir" />
+            </condition>
+            <condition property="extensible.libs.classpath"
+                    value="${tested.project.absolute.dir}/${jar.libs.dir}"
+                    else="${jar.libs.dir}">
+                <isset property="tested.project.absolute.dir" />
+            </condition>
+            <condition property="clojure.warn.reflection.env"
+                    value="${clojure.warn.reflection}"
+                    else="false">
+                <isset property="clojure.warn.reflection"/>
+            </condition>
+            <javac encoding="${java.encoding}"
+                    source="${java.source}" target="${java.target}"
+                    debug="true" extdirs=""
+                    destdir="${out.classes.absolute.dir}"
+                    bootclasspathref="android.target.classpath"
+                    verbose="${verbose}"
+                    classpath="${extensible.classpath}"
+                    classpathref="jar.libs.ref">
+                <src path="${source.absolute.dir}" />
+                <src path="${gen.absolute.dir}" />
+                <classpath>
+                    <fileset dir="${extensible.libs.classpath}" includes="*.jar" />
+                </classpath>
+            </javac>
+            <java classname="clojure.main"
+                    classpath="${clojure.jar}"
+                    classpathref="android.target.classpath"
+                    fork="true"
+                    failonerror="true">
+                <sysproperty key="clojure.compile.path" value="${clojure.out.classes.absolute.dir}"/>
+                <sysproperty key="clojure.warn.reflection" value="${clojure.warn.reflection.env}"/>
+                <classpath>
+                    <pathelement path="${extensible.classpath}"/>
+                    <pathelement path="${clojure.source.absolute.dir}"/>
+                    <path refid="jar.libs.ref"/>
+                    <fileset dir="${extensible.libs.classpath}" includes="*.jar" />
+                    <pathelement path="${clojure.out.classes.absolute.dir}"/>
+                </classpath>
+                <arg file="${android-clojure-support.dir}/clojure-compile.clj"/>
+                <arg path="${clojure.source.absolute.dir}"/>
+            </java>
+            <!-- if the project is a library then we generate a jar file -->
+            <if condition="${project.is.library}">
+                <then>
+                    <echo>Creating library output jar file...</echo>
+                    <property name="out.library.jar.file" location="${out.absolute.dir}/classes.jar" />
+                    <if>
+                        <condition>
+                            <length string="${android.package.excludes}" trim="true" when="greater" length="0" />
+                        </condition>
+                        <then>
+                            <echo>Custom jar packaging exclusion: ${android.package.excludes}</echo>
+                        </then>
+                    </if>
+                    <jar destfile="${out.library.jar.file}">
+                        <fileset dir="${out.classes.absolute.dir}" excludes="**/R.class **/R$*.class"/>
+                        <fileset dir="${source.absolute.dir}" excludes="**/*.java ${android.package.excludes}" />
+                    </jar>
+                </then>
+            </if>
 
-    <target name="compile" depends="android_rules.compile,-clojure-compile"/>
+            <!-- if the project is instrumented, intrument the classes -->
+            <if condition="${build.is.instrumented}">
+                <then>
+                    <echo>Instrumenting classes from ${out.absolute.dir}/classes...</echo>
+                    <!-- It only instruments class files, not any external libs -->
+                    <emma enabled="true">
+                        <instr verbosity="${verbosity}"
+                               mode="overwrite"
+                               instrpath="${out.absolute.dir}/classes"
+                               outdir="${out.absolute.dir}/classes">
+                        </instr>
+                        <!-- TODO: exclusion filters on R*.class and allowing custom exclusion from
+                             user defined file -->
+                    </emma>
+                </then>
+            </if>
+        </do-only-if-manifest-hasCode>
+    </target>
 </project>
 
 <!-- vim:set ts=4 sw=4 et: -->
