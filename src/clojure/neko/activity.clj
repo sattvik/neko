@@ -15,8 +15,7 @@
   (:import android.app.Activity
            android.view.View)
   (:require [neko.context :as context])
-  (:use neko.find-view
-        neko.-protocols.resolvable
+  (:use neko.-protocols.resolvable
         neko.-utils))
 
 (def 
