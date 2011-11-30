@@ -80,8 +80,8 @@ modifications to your project’s
 ``build.xml`` file.
 
 1. You must add a line to similar to the following
-   **before the line with
-   ``<import file="${sdk.dir}/tools/ant/build.xml" />``**.::
+   **before the line with**
+   ``<import file="${sdk.dir}/tools/ant/build.xml" />``.::
 
      <import file="/path/to/neko/build-support/clojure.xml"/>
 
