@@ -1,6 +1,6 @@
-===================================
- Neko: The Clojure/Android Toolkit
-===================================
+Neko: The Clojure/Android Toolkit
+=================================
+Daniel Solano_Gómez
 
 Neko is a toolkit designed to make Android development using Clojure easier and
 more fun.  It accomplishes this by making adding Clojure support to your
@@ -8,183 +8,174 @@ Android project easy and providing functional wrappers and alternatives to
 Android’s Java API.
 
 Features
-========
+--------
 
-.. WARNING::
-   Note that the libraries are under heavy development.  APIs are subject to
-   change.  In particular, ``neko.threading`` will be changed.
+WARNING: Note that the libraries are under heavy development.  APIs are subject
+to change.  In particular, `neko.threading` will be changed.
 
 The toolkit comes as two components:
 
-1. Simplified build support for Clojure using Android’s Ant-based build system,
-   and
+. Simplified build support for Clojure using Android’s Ant-based build system,
+  and
 
-2. The following Clojure libraries:
+. The following Clojure libraries:
 
-   * ``neko.compilation`` helps set up dynamic compilation.
+  * `neko.compilation` helps set up dynamic compilation.
 
-   * ``neko.context`` helps retrieve resources from the application’s context.
+  * `neko.context` helps retrieve resources from the application’s context.
 
-   * ``neko.listeners`` contains namespaces that take the tedium to
-     adding callback code to various widgets.
+  * `neko.listeners` contains namespaces that take the tedium to adding
+    callback code to various widgets.
 
-   * ``neko.log`` interns functions that make logging from your code
-     clean and simple.
+  * `neko.log` interns functions that make logging from your code clean and
+    simple.
 
-   * ``neko.threading`` will contain utilities to manage asynchronous tasks and
-     working with UI threads.
+  * `neko.threading` will contain utilities to manage asynchronous tasks and
+    working with UI threads.
   
-
 Requirements
-============
+------------
 
 Using Neko requires the following:
 
-Clojure 1.2
+Clojure 1.2::
   Other versions have not been tested.  If you would like to use dynamic
   compilation or support API level 7 (2.1/Eclair), you will need to use the
-  Clojure from branch ``android-1.2.x`` available from `this repository on
-  GitHub`__.
+  Clojure from branch `android-1.2.x` available from
+  https://github.com/sattvik/clojure/tree/android-1.2.x[this repository on
+  GitHub].
 
-__ https://github.com/sattvik/clojure/tree/android-1.2.x
-
-Android SDK Tools
+Android SDK Tools::
   Neko has been developed with the latest revision of the Android SDK tools,
   and is compatible with r14 and up of the Android SDK.
++
+WARNING: Revision 14 of the Android SDK introduced some major changes in the
+Ant build system.  Neko has been updated to use the new build system.  You will
+probably need to change your project if you have been using an older version of
+Neko/SDK.  For more detailed information,
+http://tools.android.com/recent/buildchangesinrevision14[check the Android
+Tools Project Site].
 
-.. WARNING::
-   Revision 14 of the Android SDK introduced some major changes in the Ant
-   build system.  Neko has been updated to use the new build system.  You will
-   probably need to change your project if you have been using an older version
-   of Neko/SDK.  For more detailed information, `check the Android Tools
-   Project Site`__.
-
-__ http://tools.android.com/recent/buildchangesinrevision14
-
-Android Platform SDK 7 (2.1/Eclair) or newer
+Android Platform SDK 7 (2.1/Eclair) or newer::
   In order to maintain backwards-compatibility, Neko does not support any APIs
   for newer versions of the platform.
 
 
 Use
-===
+---
 
 The following instructions should help you to add Clojure support to your
 project’s build and allow you to use the libraries within your application.
 
-Build support
--------------
+=== Build support ===
 
 To use Neko’s build support for Clojure, you will need to make two
-modifications to your project’s
-``build.xml`` file.
+modifications to your project’s `build.xml` file.
 
-1. You must add a line to similar to the following
-   **before the line with**
-   ``<import file="${sdk.dir}/tools/ant/build.xml" />``.::
+. You must add a line to similar to the following *before the line with `<import file="${sdk.dir}/tools/ant/build.xml" />`*.
++
+----
+<import file="/path/to/neko/build-support/clojure.xml"/>
+----
++
+The important thing is that the value of the `file` attribute should resolve to
+the `clojure.xml` in the `build-support` directory of this repository.  It may
+be either a relative or absolute path.
 
-     <import file="/path/to/neko/build-support/clojure.xml"/>
-
-   The important thing is that the value of the ``file`` attribute should
-   resolve to the ``clojure.xml`` in the ``build-support`` directory of this
-   repository.  It may be either a relative or absolute path.
-
-2. You must find the line that reads ``<!-- version-tag: 1 -->`` and change the
-   ``1`` to ``custom``.  If you do not do this, Android may overwrite your
-   changes.
+. You must find the line that reads `<!-- version-tag: 1 -->` and change the
+  `1` to `custom`.  If you do not do this, Android may overwrite your changes.
 
 For most projects, that is all you have to do.  So long as your Clojure source
-files are in ``src/clojure`` and you have placed a Clojure JAR file in
-``libs``, Ant will now automatically find and compile all of your Clojure code.
+files are in `src/clojure` and you have placed a Clojure JAR file in `libs`,
+Ant will now automatically find and compile all of your Clojure code.
 
-Reflection warnings
-'''''''''''''''''''
+=== Reflection warnings ===
 
 To enable reflection warnings during compilation, simply set the
-``clojure.warn.reflection`` property to ``true``.
+`clojure.warn.reflection` property to `true`.
 
 
-``clojure.properties``
-''''''''''''''''''''''
+=== `clojure.properties` ===
 
-You can place a ``clojure.properties`` file in the same directory as the
-``clojure.xml`` file.  This file will be sourced and used in any project in
-which you have enabled Clojure support.
+You can place a `clojure.properties` file in the same directory as the
+`clojure.xml` file from Neko.  This file will be sourced and used in any
+project in which you have enabled Clojure support.
 
-Test and library projects
-'''''''''''''''''''''''''
+
+=== Test and library projects ===
 
 If your project is a test or library project, you should not place a copy of
-the Clojure library in the ``libs`` directory.  If you do this, when building
-an application that uses your library or when building your test project, the
-``dx`` tool will fail due to multiple inclusions of the same Clojure classes.
+the Clojure library in the `libs` directory.  If you do this, when building an
+application that uses your library or when building your test project, the `dx`
+tool will fail due to multiple inclusions of the same Clojure classes.
 
-In these circumstances, you should either set a ``clojure.jar`` property in
-your project’s ``build.properties`` file or in the ``clojure.properties`` file
-as described in the previous section.
+In these circumstances, you should either set a `clojure.jar` property in your
+project’s `ant.properties` file or in the `clojure.properties` file as
+described in the previous section.
 
 Also, if you are developing an Android library project, you should add the
-following line to your ``build.properties`` file::
+following line to your `ant.properties` file:
 
-  source.dir=src/java
+----
+source.dir=src/java
+----
 
 This will ensure that your Clojure sources are not inadvertently included in
 any applications that use your library.
 
-Libraries
----------
+
+=== Libraries ===
 
 Neko is packaged as an Android library project.  This makes it easy to add the
 libraries to your application if you are using Android’s build system.
 Essentially, all you have to do is add a line to your project’s
-``build.properties`` similar to the following::
+`ant.properties` similar to the following:
 
-  android.library.reference.1=/path/to/neko
+----
+android.library.reference.1=/path/to/neko
+----
 
 Where the path is either absolute or relative and resolves to the base
 directory for Neko.  To learn more about Android library projects, you can read
-the SDK documentation for referencing a library project in Eclipse__ or `from
-the command line`__.
-
-__ http://developer.android.com/guide/developing/projects/projects-eclipse.html#ReferencingLibraryProject
-__ http://developer.android.com/guide/developing/projects/projects-cmdline.html#ReferencingLibraryProject
+the SDK documentation for referencing a library project in
+http://developer.android.com/guide/developing/projects/projects-eclipse.html#ReferencingLibraryProject[Eclipse]
+or
+http://developer.android.com/guide/developing/projects/projects-cmdline.html#ReferencingLibraryProject[from
+the command line].
 
 
 Legal information
-=================
+-----------------
 
-| Copyright © 2011 Sattvik Software & Technology Resources, Ltd. Co.
-| All rights reserved.
+Copyright © 2011 Sattvik Software & Technology Resources, Ltd. Co. +
+All rights reserved.
 
-Eclipse Public License - v 1.0
-------------------------------
+=== Eclipse Public License - v 1.0 ===
 
 THE ACCOMPANYING PROGRAM IS PROVIDED UNDER THE TERMS OF THIS ECLIPSE PUBLIC
 LICENSE (“AGREEMENT”). ANY USE, REPRODUCTION OR DISTRIBUTION OF THE
 PROGRAM CONSTITUTES RECIPIENT’S ACCEPTANCE OF THIS AGREEMENT.
 
-1. DEFINITIONS
-''''''''''''''
+==== 1. DEFINITIONS ====
 
 “Contribution” means:
 
-a) in the case of the initial Contributor, the initial
+a. in the case of the initial Contributor, the initial
    code and documentation distributed under this Agreement, and
 
-b) in the case of each subsequent Contributor:
+b. in the case of each subsequent Contributor:
 
    i)  changes to the Program, and
 
    ii) additions to the Program;
-
-       where such changes and/or additions to the Program originate from and
-       are distributed by that particular Contributor. A Contribution
-       ‘originates’ from a Contributor if it was added to the Program by such
-       Contributor itself or anyone acting on such Contributor’s behalf.
-       Contributions do not include additions to the Program which: (i) are
-       separate modules of software distributed in conjunction with the Program
-       under their own license agreement, and (ii) are not derivative works of
-       the Program.
++
+where such changes and/or additions to the Program originate from and are
+distributed by that particular Contributor. A Contribution ‘originates’ from a
+Contributor if it was added to the Program by such Contributor itself or anyone
+acting on such Contributor’s behalf.  Contributions do not include additions to
+the Program which: (i) are separate modules of software distributed in
+conjunction with the Program under their own license agreement, and (ii) are
+not derivative works of the Program.
 
 “Contributor” means any person or entity that distributes the Program.
 
@@ -198,16 +189,15 @@ Agreement.
 “Recipient” means anyone who receives the Program under this Agreement,
 including all Contributors.
 
-2. GRANT OF RIGHTS
-''''''''''''''''''
+==== 2. GRANT OF RIGHTS ====
 
-a) Subject to the terms of this Agreement, each Contributor hereby grants
+a. Subject to the terms of this Agreement, each Contributor hereby grants
    Recipient a non-exclusive, worldwide, royalty-free copyright license to
    reproduce, prepare derivative works of, publicly display, publicly perform,
    distribute and sublicense the Contribution of such Contributor, if any, and
-   such derivative works, in source code and object code form.p>
+   such derivative works, in source code and object code form.
 
-b) Subject to the terms of this Agreement, each Contributor hereby grants
+b. Subject to the terms of this Agreement, each Contributor hereby grants
    Recipient a non-exclusive, worldwide, royalty-free patent license under
    Licensed Patents to make, use, sell, offer to sell, import and otherwise
    transfer the Contribution of such Contributor, if any, in source code and
@@ -218,7 +208,7 @@ b) Subject to the terms of this Agreement, each Contributor hereby grants
    any other combinations which include the Contribution. No hardware per se is
    licensed hereunder.
 
-c) Recipient understands that although each Contributor grants the licenses to
+c. Recipient understands that although each Contributor grants the licenses to
    its Contributions set forth herein, no assurances are provided by any
    Contributor that the Program does not infringe the patent or other
    intellectual property rights of any other entity. Each Contributor disclaims
@@ -230,19 +220,18 @@ c) Recipient understands that although each Contributor grants the licenses to
    allow Recipient to distribute the Program, it is Recipient’s responsibility
    to acquire that license before distributing the Program.
 
-d) Each Contributor represents that to its knowledge it has sufficient
+d. Each Contributor represents that to its knowledge it has sufficient
    copyright rights in its Contribution, if any, to grant the copyright license
    set forth in this Agreement.
 
-3. REQUIREMENTS
-'''''''''''''''
+==== 3. REQUIREMENTS ====
 
 A Contributor may choose to distribute the Program in object code form under
 its own license agreement, provided that:
 
-a) it complies with the terms and conditions of this Agreement; and
+a. it complies with the terms and conditions of this Agreement; and
 
-b) its license agreement:
+b. its license agreement:
 
    i) effectively disclaims on behalf of all Contributors all warranties and
       conditions, express and implied, including warranties or conditions of
@@ -263,9 +252,9 @@ b) its license agreement:
 
 When the Program is made available in source code form:
 
-a) it must be made available under this Agreement; and
+a. it must be made available under this Agreement; and
 
-b) a copy of this Agreement must be included with each copy of the Program.
+b. a copy of this Agreement must be included with each copy of the Program.
 
 Contributors may not remove or alter any copyright notices contained within the
 Program.
@@ -274,8 +263,7 @@ Each Contributor must identify itself as the originator of its Contribution, if
 any, in a manner that reasonably allows subsequent Recipients to identify the
 originator of the Contribution.
 
-4. COMMERCIAL DISTRIBUTION
-''''''''''''''''''''''''''
+==== 4. COMMERCIAL DISTRIBUTION ====
 
 Commercial distributors of software may accept certain responsibilities with
 respect to end users, business partners and the like. While this license is
@@ -307,8 +295,7 @@ Contributors related to those performance claims and warranties, and if a court
 requires any other Contributor to pay any damages as a result, the Commercial
 Contributor must pay those damages.
 
-5. NO WARRANTY
-''''''''''''''
+==== 5. NO WARRANTY ====
 
 EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, THE PROGRAM IS
 PROVIDED ON AN “AS IS” BASIS, WITHOUT WARRANTIES OR CONDITIONS
@@ -322,8 +309,7 @@ the risks and costs of program errors, compliance with applicable laws,
 damage to or loss of data, programs or equipment, and unavailability or
 interruption of operations.
 
-6. DISCLAIMER OF LIABILITY
-''''''''''''''''''''''''''
+==== 6. DISCLAIMER OF LIABILITY ====
 
 EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, NEITHER RECIPIENT
 NOR ANY CONTRIBUTORS SHALL HAVE ANY LIABILITY FOR ANY DIRECT, INDIRECT,
@@ -334,8 +320,7 @@ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OR
 DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
 HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
-7. GENERAL
-''''''''''
+==== 7. GENERAL ====
 
 If any provision of this Agreement is invalid or unenforceable under
 applicable law, it shall not affect the validity or enforceability of
@@ -385,4 +370,4 @@ to this Agreement will bring a legal action under this Agreement more
 than one year after the cause of action arose. Each party waives its
 rights to a jury trial in any resulting litigation.
 
-.. vim:set spell
+// vim:set spell ft=asciidoc:
