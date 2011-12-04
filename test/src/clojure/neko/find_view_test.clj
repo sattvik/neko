@@ -40,7 +40,7 @@
     ; id
     (is-same output-view (find-view activity R$id/output))
     ; views not available
-    (is-nil (find-view activity 0))
+    (is-nil (find-view activity (int 0)))
     (is-nil (find-view activity :android/extractArea))
     ; check one-arg function fails
     (does-throw IllegalArgumentException
@@ -63,7 +63,7 @@
     ; id
     (is-same output-view (find-view window R$id/output))
     ; views not available
-    (is-nil (find-view window 0))
+    (is-nil (find-view window (int 0)))
     (is-nil (find-view window :android/extractArea))
     ; check one-arg function fails
     (does-throw IllegalArgumentException
@@ -86,7 +86,7 @@
     ; id
     (is-same output-view (find-view view R$id/output))
     ; views not available
-    (is-nil (find-view view 0))
+    (is-nil (find-view view (int 0)))
     (is-nil (find-view view :android/extractArea))
     ; check one-arg function fails
     (does-throw IllegalArgumentException
@@ -112,7 +112,7 @@
     ; id
     (is-same output-view (find-view dialog R$id/output))
     ; views not available
-    (is-nil (find-view dialog 0))
+    (is-nil (find-view dialog (int 0)))
     (is-nil (find-view dialog :android/extractArea))
     ; check one-arg function fails
     (does-throw IllegalArgumentException
@@ -147,5 +147,5 @@
       ; id
       (is-same output-view (find-view R$id/output))
       ; views not available
-      (is-nil (find-view 0))
+      (is-nil (find-view (int 0)))
       (is-nil (find-view :android/extractArea)))))

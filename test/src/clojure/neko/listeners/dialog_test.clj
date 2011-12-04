@@ -62,7 +62,7 @@
     (.onClick macro-listener test-dialog 2)
     (.onClick fn-listener test-dialog 3)
     (.onClick macro-listener test-dialog 5)
-    (is-eq [:neutral :negative :positive 0 1 2 3 5] @buttons)))
+    (is-eq [:neutral :negative :positive (int 0) (int 1) (int 2) (int 3) (int 5)] @buttons)))
 
 (defn -testOnDismiss
   "Tests the on-dismiss macro and on-dismiss-call function."
@@ -112,8 +112,8 @@
     (.onClick macro-listener test-dialog 3 false)
     (.onClick fn-listener test-dialog 0 false)
     (.onClick macro-listener test-dialog 4 true)
-    (is-eq [[0 true]
-            [3 false]
-            [0 false]
-            [4 true]]
+    (is-eq [[(int 0) true]
+            [(int 3) false]
+            [(int 0) false]
+            [(int 4) true]]
            @choices)))
