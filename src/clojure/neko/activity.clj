@@ -19,7 +19,8 @@
         neko.-utils))
 
 (def 
-  ^{:doc "The current activity to operate on."}
+  ^{:doc "The current activity to operate on."
+    :dynamic true}
   *activity*)
 
 (defmacro with-activity

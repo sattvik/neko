@@ -17,7 +17,8 @@
         neko.-utils))
 
 (def 
-  ^{:doc "The current context object to operate on."}
+  ^{:doc "The current context object to operate on."
+    :dynamic true}
   *context*)
 
 (defn context?

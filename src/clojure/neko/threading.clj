@@ -91,7 +91,8 @@
   [task f]
   (assoc task :cancel-fn f))
 
-(def ^{:private true}
+(def ^{:private true
+       :dynamic true}
   *async-task*)
 
 (defn publish-progress
