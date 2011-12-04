@@ -54,7 +54,7 @@
 (defn post-delayed
   "Causes the macro body to be added to the message queue.  It will execute on
   the UI thread.  Returns true if successfully placed in the message queue."
-  [^View view ^long millis & body]
+  [view millis & body]
   `(post-delayed* ~view ~millis (fn [] ~@body)))
 
 (defn on-ui-thread?
