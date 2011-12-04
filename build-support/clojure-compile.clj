@@ -55,7 +55,7 @@
        true
        (catch clojure.lang.Compiler$CompilerException e
          (let [msg (.getMessage e)
-               cnfe-pattern #"^java\.lang\.ClassNotFoundException: ([a-zA-z0-9-_.]+) \(.*:\d+\)$"]
+               cnfe-pattern #"^java\.lang\.ClassNotFoundException: ([a-zA-z0-9-_.]+)(, compiling:| )\(.*:\d+\)$"]
            (let [matches (re-matches cnfe-pattern msg)]
              (if matches
                (let [not-found-ns (symbol (matches 1))]
