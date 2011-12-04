@@ -63,7 +63,8 @@
                     bootclasspathref="android.target.classpath"
                     verbose="${verbose}"
                     classpath="${extensible.classpath}"
-                    classpathref="jar.libs.ref">
+                    classpathref="jar.libs.ref"
+                    includeantruntime="false">
                 <src path="${source.absolute.dir}" />
                 <src path="${gen.absolute.dir}" />
                 <classpath>
