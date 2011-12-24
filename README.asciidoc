@@ -39,17 +39,24 @@ The toolkit comes as two components:
 Using Neko requires the following:
 
 Clojure::
-  Other versions have not been tested.  If you would like to use dynamic
-  compilation or support API level 7 (2.1/Eclair), you will need to use the
-  Clojure from branch `android-1.2.x` available from
-  https://github.com/sattvik/clojure/tree/android-1.2.x[this repository on
-  GitHub].
 
+  Stock Clojure version 1.2 will work on Android 2.2 (Froyo) and newer.
+  Clojure 1.3 currently only works with Android 2.3 (Gingerbread) and newer.
++
+Special versions of Clojure for Android development are available from two
+different branches in https://github.com/sattvik/clojure[this repository on
+GitHub].  These versions support dynamic compilation on an Android device.
+The https://github.com/sattvik/clojure/tree/android[`android`] branch contains
+the latest development from both core Clojure and Android-specific work.
+However, it only supports Android 2.3 and up.  The
+https://github.com/sattvik/clojure/tree/android-1.2.x[`android-1.2.x`] branch
+is based off of Clojure 1.2.1 and supports Android versions since Android 2.1
+(Eclair).
 
 Android SDK Tools::
   Neko has been developed with the latest revision of the Android SDK tools,
   and is compatible with r14 and up of the Android SDK.
-
++
 WARNING: Revision 14 of the Android SDK introduced some major changes in the
 Ant build system.  Neko has been updated to use the new build system.  You will
 probably need to change your project if you have been using an older version of
