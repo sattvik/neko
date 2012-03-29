@@ -58,18 +58,19 @@
             </condition>
             <javac encoding="${java.encoding}"
                     source="${java.source}" target="${java.target}"
-                    debug="true" extdirs=""
+                    debug="true" extdirs="" includeantruntime="false"
                     destdir="${out.classes.absolute.dir}"
                     bootclasspathref="android.target.classpath"
                     verbose="${verbose}"
                     classpath="${extensible.classpath}"
-                    classpathref="jar.libs.ref"
-                    includeantruntime="false">
+                    classpathref="project.libraries.jars"
+                    fork="${need.javac.fork}">
                 <src path="${source.absolute.dir}" />
                 <src path="${gen.absolute.dir}" />
                 <classpath>
                     <fileset dir="${extensible.libs.classpath}" includes="*.jar" />
                 </classpath>
+                <compilerarg line="${java.compilerargs}" />
             </javac>
             <java classname="clojure.main"
                     classpath="${clojure.jar}"
@@ -81,7 +82,7 @@
                 <classpath>
                     <pathelement path="${extensible.classpath}"/>
                     <pathelement path="${clojure.source.absolute.dir}"/>
-                    <path refid="jar.libs.ref"/>
+                    <path refid="project.libraries.jars"/>
                     <fileset dir="${extensible.libs.classpath}" includes="*.jar" />
                     <pathelement path="${clojure.out.classes.absolute.dir}"/>
                 </classpath>
@@ -101,8 +102,13 @@
                             <echo>Custom jar packaging exclusion: ${android.package.excludes}</echo>
                         </then>
                     </if>
+
+                    <propertybyreplace name="manifest.package.path" input="${manifest.package}" replace="." with="/" />
+
                     <jar destfile="${out.library.jar.file}">
-                        <fileset dir="${out.classes.absolute.dir}" excludes="**/R.class **/R$*.class"/>
+                        <fileset dir="${out.classes.absolute.dir}"
+                                includes="**/*.class"
+                                excludes="${manifest.package.path}/R.class ${manifest.package.path}/R$*.class ${manifest.package.path}/Manifest.class ${manifest.package.path}/Manifest$*.class ${manifest.package.path}/BuildConfig.class"/>
                         <fileset dir="${source.absolute.dir}" excludes="**/*.java ${android.package.excludes}" />
                     </jar>
                 </then>
@@ -118,9 +124,9 @@
                                mode="overwrite"
                                instrpath="${out.absolute.dir}/classes"
                                outdir="${out.absolute.dir}/classes">
+                            <filter excludes="${manifest.package}.R,${manifest.package}.R$$*,${manifest.package}.BuildConfig" />
+                            <filter value="${emma.filter}" />
                         </instr>
-                        <!-- TODO: exclusion filters on R*.class and allowing custom exclusion from
-                             user defined file -->
                     </emma>
                 </then>
             </if>

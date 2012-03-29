@@ -47,14 +47,15 @@ Clojure 1.2::
 
 Android SDK Tools::
   Neko has been developed with the latest revision of the Android SDK tools,
-  and is compatible with r14 and up of the Android SDK.
+  and is compatible with r17 and up of the Android SDK.
 +
-WARNING: Revision 14 of the Android SDK introduced some major changes in the
-Ant build system.  Neko has been updated to use the new build system.  You will
+WARNING: Revisions 14 and 17 of the Android SDK introduced changes in the Ant
+build system.  Neko has been updated to use the build system in r17.  You will
 probably need to change your project if you have been using an older version of
-Neko/SDK.  For more detailed information,
-http://tools.android.com/recent/buildchangesinrevision14[check the Android
-Tools Project Site].
+Neko/SDK.  For more detailed information, check the Android Tools Project site
+for information about the breaking changes in
+http://tools.android.com/recent/buildchangesinrevision14[r14] and
+http://tools.android.com/recent/dealingwithdependenciesinandroidprojects[r17].
 
 Android Platform SDK 7 (2.1/Eclair) or newer::
   In order to maintain backwards-compatibility, Neko does not support any APIs
@@ -86,8 +87,9 @@ be either a relative or absolute path.
   `1` to `custom`.  If you do not do this, Android may overwrite your changes.
 
 For most projects, that is all you have to do.  So long as your Clojure source
-files are in `src/clojure` and you have placed a Clojure JAR file in `libs`,
-Ant will now automatically find and compile all of your Clojure code.
+files are in `src/clojure` and you have placed a Clojure JAR file in `libs`
+directory of your Neko installation, Ant will now automatically find and
+compile all of your Clojure code.
 
 === Reflection warnings ===
 
@@ -104,14 +106,9 @@ project in which you have enabled Clojure support.
 
 === Test and library projects ===
 
-If your project is a test or library project, you should not place a copy of
-the Clojure library in the `libs` directory.  If you do this, when building an
-application that uses your library or when building your test project, the `dx`
-tool will fail due to multiple inclusions of the same Clojure classes.
-
-In these circumstances, you should either set a `clojure.jar` property in your
-project’s `ant.properties` file or in the `clojure.properties` file as
-described in the previous section.
+As of r17 of the Android SDK, you should now be able to place a copy of the
+Clojure JAR in the `libs` directory of Neko and it should automatically be
+picked up by any projects that depend on it.
 
 Also, if you are developing an Android library project, you should add the
 following line to your `ant.properties` file:
