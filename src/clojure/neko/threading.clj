@@ -37,7 +37,7 @@
   [^View view ^IFn f]
   (.post view (reify Runnable (run [this] (f)))))
 
-(defn post
+(defmacro post
   "Causes the macro body to be added to the message queue.  It will execute on
   the UI thread.  Returns true if successfully placed in the message queue."
   [^View view & body]
@@ -51,7 +51,7 @@
   [^View view ^long millis  ^IFn f]
   (.postDelayed view (reify Runnable (run [this] (f))) millis ))
 
-(defn post-delayed
+(defmacro post-delayed
   "Causes the macro body to be added to the message queue.  It will execute on
   the UI thread.  Returns true if successfully placed in the message queue."
   [view millis & body]
