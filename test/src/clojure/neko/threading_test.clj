@@ -33,7 +33,7 @@
         junit.assert))
 
 (defn -init []
-  [[com.sattvik.neko.test_app.TestActivity] nil])
+  [[com.sattvik.neko.tests.TestActivity] nil])
 
 (defn -testRunOnUiThread [this]
   (let [ui-thread (Thread/currentThread)

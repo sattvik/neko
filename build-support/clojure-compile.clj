@@ -53,21 +53,20 @@
        (compile ns)
        (swap! compiled-ns conj ns)
        true
-       (catch clojure.lang.Compiler$CompilerException e
+       (catch Exception e
          (let [msg (.getMessage e)
-               cnfe-pattern #"^java\.lang\.ClassNotFoundException: ([a-zA-z0-9-_.]+)(, compiling:| )\(.*:\d+\)$"]
-           (let [matches (re-matches cnfe-pattern msg)]
-             (if matches
-               (let [not-found-ns (symbol (matches 1))]
-                 (println (format "Dependency failure detected, will try to compile %s." not-found-ns))
-                 (if (failed-ns not-found-ns)
-                   (throw e)
-                   (if (compile-ns not-found-ns (conj failed-ns ns))
-                     (do
-                       (println "Failure resolved.")
-                       (compile-ns ns failed-ns))
-                     (throw e))))
-               (throw e))))))))
+               cnfe-pattern #".*java\.lang\.ClassNotFoundException: ([a-zA-z0-9-_.]+)(, compiling:| )\(.*:\d+\)$"]
+           (if-let [matches (re-matches cnfe-pattern msg)]
+             (let [not-found-ns (symbol (matches 1))]
+               (println (format "Dependency failure detected, will try to compile %s." not-found-ns))
+               (if (failed-ns not-found-ns)
+                 (throw e)
+                 (if (compile-ns not-found-ns (conj failed-ns ns))
+                   (do
+                     (println "Failure resolved.")
+                     (compile-ns ns failed-ns))
+                   (throw e))))
+             (throw e)))))))
   ([ns]
    (compile-ns ns #{})))
 

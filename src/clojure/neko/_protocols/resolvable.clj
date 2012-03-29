@@ -55,6 +55,12 @@
   (resolve-string [id _] id)
   (resolve-layout [id _] id)
 
+  Long
+  (resolve-it [id _1 _2] (.intValue id))
+  (resolve-id [id _] (.intValue id))
+  (resolve-string [id _] (.intValue id))
+  (resolve-layout [id _] (.intValue id))
+
   clojure.lang.Keyword
   (resolve-it
     [name context type] (resolve-from-keyword context type name))

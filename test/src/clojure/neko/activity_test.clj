@@ -29,8 +29,8 @@
                         [testRequestWindowFeaturesManyFeaturesInContext [] void]
                         [testRequestWindowFeaturesBadFeatures [] void]])
   (:import android.view.Window
-           com.sattvik.neko.test_app.R$id)
-  (:require [com.sattvik.neko.test_app.TestActivity :as test-activity])
+           com.sattvik.neko.tests.R$id)
+  (:require [com.sattvik.neko.tests.TestActivity :as test-activity])
   (:use [neko activity
               [context :only [*context*]]
               find-view
@@ -38,7 +38,7 @@
         junit.assert))
 
 (defn -init []
-  [[com.sattvik.neko.test_app.TestActivity] nil])
+  [[com.sattvik.neko.tests.TestActivity] nil])
 
 (defn -testWithActivity
   "Test that the with-activity macro."

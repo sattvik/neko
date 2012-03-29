@@ -84,6 +84,12 @@
      :post [(nil-or-view? %)]}
     (find-view *activity* id))
 
+  Long
+  (find-view [id]
+    {:pre [(has-*activity*?)]
+     :post [(nil-or-view? %)]}
+    (find-view *activity* (.intValue id)))
+
   clojure.lang.Keyword
   (find-view [id]
     {:pre [(has-*activity*?)]

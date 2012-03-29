@@ -47,7 +47,7 @@
 (defn start-activity []
   (when-not @activity
     (let [package (.. @the-test getInstrumentation getTargetContext getPackageName) ]
-      (reset! activity (.launchActivity @the-test package com.sattvik.neko.test_app.TestActivity nil))))
+      (reset! activity (.launchActivity @the-test package com.sattvik.neko.tests.TestActivity nil))))
   @activity)
 
 (defn -setUp

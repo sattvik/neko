@@ -23,7 +23,7 @@
                         [testInflateLayout [] void]]
               :exposes-methods {setUp superSetUp})
   (:import android.content.Context
-           [com.sattvik.neko.test_app R$id R$layout R$string])
+           [com.sattvik.neko.tests R$id R$layout R$string])
   (:use neko.context
         junit.assert))
 
@@ -45,9 +45,9 @@
 (defn -testResolveResource
   "Tests the resolve-resource function."
   [this]
-  (let [test-string-id com.sattvik.neko.test_app.R$string/test_string
-        icon-id        com.sattvik.neko.test_app.R$drawable/icon
-        layout-id      com.sattvik.neko.test_app.R$layout/main]
+  (let [test-string-id com.sattvik.neko.tests.R$string/test_string
+        icon-id        com.sattvik.neko.tests.R$drawable/icon
+        layout-id      com.sattvik.neko.tests.R$layout/main]
     ; basic tests
     (is-eq test-string-id
            (resolve-resource @context :string :test_string))
@@ -64,7 +64,7 @@
     ; test using namespace
     (is-eq test-string-id
            (resolve-resource @context :string
-                             :com.sattvik.neko.test_app/test-string))
+                             :com.sattvik.neko.tests/test-string))
     ; basic tests with context
     (with-context @context
       (is-eq test-string-id

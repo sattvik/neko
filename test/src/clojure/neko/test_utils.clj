@@ -20,8 +20,8 @@
   (doto (Intent.)
     (.addCategory Intent/CATEGORY_LAUNCHER)
     (.addFlags Intent/FLAG_ACTIVITY_NEW_TASK)
-    (.setClassName "com.sattvik.neko.test_app"
-                   "com.sattvik.neko.test_app.TestActivity")
+    (.setClassName "com.sattvik.neko.tests"
+                   "com.sattvik.neko.tests.TestActivity")
     (.setAction Intent/ACTION_MAIN)))
 
 (defn start-activity

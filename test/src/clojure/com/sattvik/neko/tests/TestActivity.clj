@@ -9,11 +9,11 @@
 ; terms of this license.  You must not remove this notice, or any other, from
 ; this software.
 
-(ns com.sattvik.neko.test_app.TestActivity
+(ns com.sattvik.neko.tests.TestActivity
   (:gen-class :main false
               :extends android.app.Activity
               :exposes-methods {onCreate superOnCreate})
-  (:import com.sattvik.neko.test_app.R$layout))
+  (:import com.sattvik.neko.tests.R$layout))
 
 (def set-content-view? (atom true))
 

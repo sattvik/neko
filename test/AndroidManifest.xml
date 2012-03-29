@@ -9,7 +9,14 @@
     <!-- We add an application tag here just so that we can indicate that
          this package needs to link against the android.test library,
          which is needed when building test cases. -->
-    <application>
+    <application android:label="@string/app_name" android:icon="@drawable/icon">
+        <activity android:name="TestActivity"
+                android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <uses-library android:name="android.test.runner" />
     </application>
     <!--
@@ -18,8 +25,11 @@
     "adb shell am instrument -w clojure.contrib.android.tests/android.test.InstrumentationTestRunner"
     -->
     <instrumentation android:name="android.test.InstrumentationTestRunner"
-                     android:targetPackage="com.sattvik.neko.test_app"
+                     android:targetPackage="com.sattvik.neko.tests"
                      android:label="Tests for Neko"/>
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.READ_LOGS"/>
 </manifest>
 
 <!-- vim:set et sw=4 ts=4: -->

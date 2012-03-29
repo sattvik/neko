@@ -21,14 +21,14 @@
                         [testView [] void]
                         [testDialog [] void]
                         [testOneArg [] void]])
-  (:import [com.sattvik.neko.test_app R$id R$layout])
+  (:import [com.sattvik.neko.tests R$id R$layout])
   (:use [neko activity
               find-view
               test-utils]
         junit.assert))
 
 (defn -init []
-  [[com.sattvik.neko.test_app.TestActivity] nil])
+  [[com.sattvik.neko.tests.TestActivity] nil])
 
 (defn -testActivity
   "Tests the ViewFinder protocol with an Activity."
