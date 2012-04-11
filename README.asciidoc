@@ -221,11 +221,7 @@ For example, given the package `com.example.hello_clojure` and the activity
 `src/clojure/com/example/hello_clojure/HelloActivity.clj` as follows:
 
 ++++
-<script src="https://gist.github.com/2361385.js?file=HelloActivity.clj"></script>
-++++
-
-[source,lisp]
-----
+<pre>
 (ns com.example.hello_clojure.HelloActivity
   (:gen-class :main false
               :extends android.app.Activity
@@ -237,7 +233,8 @@ For example, given the package `com.example.hello_clojure` and the activity
   (doto this
     (.superOnCreate bundle)
     (.setContentView R$layout/main)))
-----
+</pre>
+++++
 
 === 10. Build and run it ===
 
