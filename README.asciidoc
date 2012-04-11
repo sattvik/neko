@@ -32,18 +32,25 @@ The toolkit comes as two components:
 
   * `neko.threading` will contain utilities to manage asynchronous tasks and
     working with UI threads.
-  
+
 Requirements
 ------------
 
 Using Neko requires the following:
 
-Clojure 1.2::
-  Other versions have not been tested.  If you would like to use dynamic
-  compilation or support API level 7 (2.1/Eclair), you will need to use the
-  Clojure from branch `android-1.2.x` available from
-  https://github.com/sattvik/clojure/tree/android-1.2.x[this repository on
-  GitHub].
+Clojure 1.2 or newer::
+  Clojure 1.2 works on Android 2.2 and newer.  Clojure 1.3 and newer work on
+  Android 2.3 and newer.
++
+If you would like to use dynamic compilation with Android 2.3 and newer, use
+the Clojure available from the `android` branch from
+https://github.com/sattvik/clojure/tree/android[this repository on
+  GitHub].  This branch is based off the latest Clojure development version.
++
+If you would like to use dynamic compilation, but must support Android 2.1, you
+will need to use the version from branch `android-1.2.x`,  available
+https://github.com/sattvik/clojure/tree/android-1.2.x[here].  This is based off
+of Clojure 1.2.1.
 
 Android SDK Tools::
   Neko has been developed with the latest revision of the Android SDK tools,
@@ -62,16 +69,117 @@ Android Platform SDK 7 (2.1/Eclair) or newer::
   for newer versions of the platform.
 
 
-Use
----
+Getting started with Neko
+-------------------------
 
 The following instructions should help you to add Clojure support to your
 project’s build and allow you to use the libraries within your application.
 
-=== Build support ===
+=== 1. Install the Android SDK ===
 
-To use Neko’s build support for Clojure, you will need to make two
-modifications to your project’s `build.xml` file.
+You can get this from https://developer.android.com/sdk/index.html[directly
+from Google].  You will need to be sure to also install a platform for
+development.  The
+http://wiki.cyanogenmod.com/index.php?title=Howto:_Install_the_Android_SDK[CyanogenMod
+wiki] has some more detailed instructions.
+
+=== 2. Get Neko ===
+
+Just clone the repository to your computer:
+
+----
+% git clone https://github.com/sattvik/neko.git
+----
+
+If all went well, Neko should now be in a directory called `neko`.
+
+
+=== 3. Add Clojure ===
+
+Now, go into the `neko` directory and created a directory called `libs`.  Copy
+`clojure.jar` into that directory.  If you don't already have Clojure
+installed, http://clojure.org/downloads[you can download it from the project’s
+page].
+
+=== 4. Create your project ===
+
+Next, you will need to create a new Android project using the `android` command
+from the Android SDK, as follows:
+
+----
+% android create project -p <directory> -t <target> -k <package> -a <activity>
+----
+
+The arguments to this command are:
+
+`<directory>`::
+
+  The name of the directory for your new project.
+
+`<target>`::
+
+  The target API version you will use for development.  For example, you could
+  use `android-15` to target the Android 4.0.3 platform.  You can see a list of
+  targets available by running `android list targets`.
+
+`<package>`::
+
+  This unique string will be used to identify your application.  You should follow the
+  http://www.oracle.com/technetwork/java/codeconventions-135099.html[package
+  naming conventions].  An example may be `com.example.cool_clojure_app`.
+
+`<activity>`::
+
+  This is the name of a class that will be the entry point of your application.
+
+
+Once you run this, you will see a bunch of output as the SDK generates your
+project, for example:
+
+----
+% android create project -p hello -k com.example.hello_clojure -a HelloActivity -t android-15
+Created project directory: hello
+Created directory /home/dan/devel/android/hello/src/com/example/hello_clojure
+Added file hello/src/com/example/hello_clojure/HelloActivity.java
+Created directory /home/dan/devel/android/hello/res
+Created directory /home/dan/devel/android/hello/bin
+Created directory /home/dan/devel/android/hello/libs
+Created directory /home/dan/devel/android/hello/res/values
+Added file hello/res/values/strings.xml
+Created directory /home/dan/devel/android/hello/res/layout
+Added file hello/res/layout/main.xml
+Created directory /home/dan/devel/android/hello/res/drawable-hdpi
+Created directory /home/dan/devel/android/hello/res/drawable-mdpi
+Created directory /home/dan/devel/android/hello/res/drawable-ldpi
+Added file hello/AndroidManifest.xml
+Added file hello/build.xml
+Added file hello/proguard-project.txt
+----
+
+=== 5. Add Neko as a library for your project ===
+
+Change into the new directory for your project and calculate the relative path
+to the directory where you cloned Neko.  Now, run the following command:
+
+----
+% android update project -p . -l <../relative/path/to/neko>
+----
+
+For example:
+
+----
+% cd hello
+% android update project -p . -l ../neko
+Resolved location of library project to: /home/user/work/neko
+Updated project.properties
+Updated local.properties
+Updated file ./proguard-project.txt
+----
+
+=== 6. Get Ant to build your Clojure code ===
+
+To enable Neko’s build support for Clojure, you will need to make two
+modifications to the `build.xml` file in your project directory.
 
 . You must add a line to similar to the following *before the line with `<import file="${sdk.dir}/tools/ant/build.xml" />`*.
 +
@@ -86,59 +194,87 @@ be either a relative or absolute path.
 . You must find the line that reads `<!-- version-tag: 1 -->` and change the
   `1` to `custom`.  If you do not do this, Android may overwrite your changes.
 
-For most projects, that is all you have to do.  So long as your Clojure source
-files are in `src/clojure` and you have placed a Clojure JAR file in `libs`
-directory of your Neko installation, Ant will now automatically find and
-compile all of your Clojure code.
+=== 7. Get rid of that Java file  ===
+
+You may have noticed that when you created the project file, Android generated
+a Java file corresponding to the package and activity name.  Delete it.  For
+example:
+
+----
+% rm -r src/com
+----
+
+=== 8. Create a source directory for you Clojure files ===
+
+By default, Neko looks in `src/clojure`.
+
+----
+% mkdir src/clojure
+----
+
+=== 9. Write your first Android application in Clojure ===
+
+For replicate the default activity that the SDK created in Clojure, you will
+need to create a source file with the same namespace as the original file.
+For example, given the package `com.example.hello_clojure` and the activity
+`HelloActivity`, you would create the file
+`src/clojure/com/example/hello_clojure/HelloActivity.clj` as follows:
+
+[source,lisp]
+.HelloActivity.clj
+----
+(ns com.example.hello_clojure.HelloActivity
+  (:gen-class :main false
+              :extends android.app.Activity
+              :exposes-methods {onCreate superOnCreate})
+  (:import [com.example.hello_clojure R$layout]))
+
+(defn -onCreate
+  [this bundle]
+  (doto this
+    (.superOnCreate bundle)
+    (.setContentView R$layout/main)))
+----
+
+=== 10. Build and run it ===
+
+You can now run and install the application to a running emulator or a
+connected device using:
+
+----
+% ant debug install
+----
+
+If all went well, you should be able to find your application in the launcher.
+When you run it, after several seconds, you should see a simple `Hello World'
+appear.
+
+=== 11. Make something wonderful ===
+
+From this point on, it is up to you to create something wonderful.
+
+
+Advanced topics
+---------------
+
+Here are some more things you can do with Neko:
+
+=== `clojure.properties` ===
+
+You can place a `clojure.properties` file in the `build-support` directory from
+Neko (where `clojure.xml` lives).  This file will be sourced and used in any
+project in which you have enabled Clojure build support.
 
 === Reflection warnings ===
 
 To enable reflection warnings during compilation, simply set the
-`clojure.warn.reflection` property to `true`.
+`clojure.warn.reflection` property to `true`.  This is something that might be
+good to put in that `clojure.properties` file.
 
+=== Mixed Java/Clojure projects ===
 
-=== `clojure.properties` ===
-
-You can place a `clojure.properties` file in the same directory as the
-`clojure.xml` file from Neko.  This file will be sourced and used in any
-project in which you have enabled Clojure support.
-
-
-=== Test and library projects ===
-
-As of r17 of the Android SDK, you should now be able to place a copy of the
-Clojure JAR in the `libs` directory of Neko and it should automatically be
-picked up by any projects that depend on it.
-
-Also, if you are developing an Android library project, you should add the
-following line to your `ant.properties` file:
-
-----
-source.dir=src/java
-----
-
-This will ensure that your Clojure sources are not inadvertently included in
-any applications that use your library.
-
-
-=== Libraries ===
-
-Neko is packaged as an Android library project.  This makes it easy to add the
-libraries to your application if you are using Android’s build system.
-Essentially, all you have to do is add a line to your project’s
-`ant.properties` similar to the following:
-
-----
-android.library.reference.1=/path/to/neko
-----
-
-Where the path is either absolute or relative and resolves to the base
-directory for Neko.  To learn more about Android library projects, you can read
-the SDK documentation for referencing a library project in
-http://developer.android.com/guide/developing/projects/projects-eclipse.html#ReferencingLibraryProject[Eclipse]
-or
-http://developer.android.com/guide/developing/projects/projects-cmdline.html#ReferencingLibraryProject[from
-the command line].
+Neko will build all Java sources you have placed in `src/java` before any
+Clojure sources.
 
 
 Legal information
