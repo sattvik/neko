@@ -1,5 +1,5 @@
 bin/
 gen/
-clojure-nosrc.jar
+libs/
 local.properties
 clojure.properties
