@@ -221,7 +221,6 @@ For example, given the package `com.example.hello_clojure` and the activity
 `src/clojure/com/example/hello_clojure/HelloActivity.clj` as follows:
 
 [source,lisp]
-.`HelloActivity.clj`
 ----
 (ns com.example.hello_clojure.HelloActivity
   (:gen-class :main false
